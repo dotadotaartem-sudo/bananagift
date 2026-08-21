@@ -1,12 +1,1 @@
-{
-  "users": {
-    "8989575087": {
-      "stars": 0,
-      "inventory": [],
-      "history": [],
-      "total_opened": 0,
-      "total_spent": 0,
-      "joined": "2026-08-21T10:14:52.839Z"
-    }
-  }
-}
+{"users":{"8989575087":{"stars":1000,"inventory":[],"history":[],"total_opened":0,"total_spent":0,"joined":"2026-08-21T08:28:36.813Z"}}}
