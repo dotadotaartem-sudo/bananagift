@@ -1,11 +1,29 @@
 {
   "users": {
     "8989575087": {
-      "stars": 1000,
-      "inventory": [],
-      "history": [],
-      "total_opened": 0,
-      "total_spent": 0,
+      "stars": 995,
+      "inventory": [
+        {
+          "name": "Heart",
+          "emoji": "❤️",
+          "img": "/img/gifts/heart.png",
+          "value": 1,
+          "rarity": "common",
+          "from_case": "Super Summer Capsule",
+          "time": "2026-08-21T12:59:54.732Z"
+        }
+      ],
+      "history": [
+        {
+          "case": "Super Summer Capsule",
+          "item": "Heart",
+          "value": 1,
+          "profit": -4,
+          "time": "2026-08-21T12:59:54.732Z"
+        }
+      ],
+      "total_opened": 1,
+      "total_spent": 5,
       "joined": "2026-08-21T08:28:36.813Z"
     }
   }
