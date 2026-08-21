@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: exitency-bot
+    name: bananagift
     runtime: node
     plan: free
     buildCommand: npm install

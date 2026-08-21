@@ -1,345 +1,209 @@
-const API = '';
 let uid = 0;
 let balance = 0;
 let inventory = [];
-let selectedPack = null;
+let currentCase = null;
+let upgradeTable = {};
 
-// Init
 (async function init() {
   if (window.Telegram && Telegram.WebApp) {
     Telegram.WebApp.ready();
-    uid = Telegram.WebApp.initDataUnsafe?.user?.id || 12345678;
-  } else {
-    uid = 12345678;
+    Telegram.WebApp.expand();
+    if (Telegram.WebApp.enableVerticalScrolling) Telegram.WebApp.enableVerticalScrolling();
+    uid = Telegram.WebApp.initDataUnsafe?.user?.id;
   }
-  await loadUser();
-  await loadCases();
-  setupTabs();
+  if (!uid) {
+    const params = new URLSearchParams(window.location.search);
+    uid = parseInt(params.get('uid')) || 12345678;
+  }
+  const name = (window.Telegram && Telegram.WebApp ? Telegram.WebApp.initDataUnsafe?.user?.first_name : null) || 'User';
+  const photo = (window.Telegram && Telegram.WebApp ? Telegram.WebApp.initDataUnsafe?.user?.photo_url : null);
+  document.getElementById('profileName').textContent = name;
+  document.getElementById('profileId').textContent = 'ID: ' + uid;
+  if (photo) document.getElementById('profileAvatar').innerHTML = `<img src="${photo}" style="width:72px;height:72px;border-radius:50%;object-fit:cover">`;
+  await Promise.all([loadUser(), loadCases()]);
+  loadShop();
 })();
 
 async function api(path, opts) {
-  const r = await fetch(API + path, opts);
+  const r = await fetch(path, opts);
   return r.json();
 }
 
 async function loadUser() {
   const u = await api(`/api/user/${uid}`);
-  balance = u.stars;
+  balance = u.stars || 0;
   inventory = u.inventory || [];
-  document.getElementById('balance').textContent = `★ ${balance.toLocaleString()}`;
+  updateBalances();
+  loadHistory();
 }
 
-// TABS
-function setupTabs() {
-  document.querySelectorAll('.tab').forEach(t => {
-    t.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-      t.classList.add('active');
-      const tab = t.dataset.tab;
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      document.getElementById('sec-' + tab).classList.add('active');
-      if (tab === 'inventory') loadInventory();
-      if (tab === 'upgrade') loadUpgradeItems();
-      if (tab === 'shop') { loadPacks(); loadMethods(); }
-    });
-  });
+function updateBalances() {
+  const topEl = document.getElementById('topStars');
+  const isShop = document.getElementById('page-shop')?.classList.contains('active');
+  if (isShop) { topEl.style.display = 'none'; }
+  else { topEl.style.display = 'flex'; }
+  document.getElementById('topBalance').textContent = balance.toLocaleString();
+  document.getElementById('profileBalance').textContent = balance.toLocaleString();
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById('page-' + name);
+  if (page) page.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navItem = document.querySelector(`.nav-item[data-page="${name}"]`);
+  if (navItem) navItem.classList.add('active');
+
+  const topEl = document.getElementById('topStars');
+  if (name === 'shop') { topEl.style.display = 'none'; }
+  else { topEl.style.display = 'flex'; }
+
+  if (name === 'cases') loadCases();
+  if (name === 'profile') { loadProfile(); loadInventory(); loadHistory(); }
 }
 
 // CASES
 async function loadCases() {
   const cases = await api('/api/cases');
-  const grid = document.getElementById('caseGrid');
-  grid.innerHTML = cases.map(c => `
-    <div class="case-card" onclick="openCaseView('${c.id}')" style="--cc:${c.color}">
-      <div class="case-icon">${c.icon}</div>
+  const el = document.getElementById('caseList');
+  el.innerHTML = cases.map(c => `
+    <div class="case-card" onclick="openCase('${c.id}')">
+      <div class="case-icon"><img src="${c.img}" class="case-img" onerror="this.style.display='none';this.parentElement.textContent='${c.icon}'"></div>
       <div class="case-name">${c.name}</div>
       <div class="case-price">★ ${c.price}</div>
-      <div class="case-count">${c.items_count} items</div>
     </div>
   `).join('');
 }
 
-let currentCase = null;
-
-async function openCaseView(cid) {
+async function openCase(cid) {
+  currentCase = cid;
   const cases = await api('/api/cases');
-  currentCase = cases.find(c => c.id === cid);
+  const c = cases.find(x => x.id === cid);
   const items = await api(`/api/case/${cid}/items`);
 
-  document.getElementById('caseOpenHeader').innerHTML = `
-    <div class="co-icon">${currentCase.icon}</div>
-    <div class="co-name">${currentCase.name}</div>
-    <div class="co-price">★ ${currentCase.price}</div>
+  document.getElementById('caseOpenTop').innerHTML = `
+    <div class="case-open-icon"><img src="${c.img}" class="case-open-img" onerror="this.style.display='none';this.parentElement.textContent='${c.icon}'"></div>
+    <div class="case-open-name">${c.name}</div>
+    <div class="case-open-price">★ ${c.price}</div>
   `;
-
-  document.getElementById('caseItemsList').innerHTML = items.map(i => `
-    <div class="ci-item rarity-${i.rarity}">
-      <div class="ci-emoji">${i.emoji}</div>
-      <div class="ci-name">${i.name}</div>
-      <div class="ci-val">★ ${i.value}</div>
-      <div class="ci-chance">${i.chance}%</div>
+  document.getElementById('spinnerContainer').style.display = 'none';
+  document.getElementById('resultWrap').innerHTML = '';
+  document.getElementById('openBtnWrap').innerHTML = `<button class="btn btn-pink" onclick="doOpen()">Open Case</button>`;
+  document.getElementById('caseItemsGrid').innerHTML = items.map(i => `
+    <div class="item-card rarity-${i.rarity}">
+      <div class="ic-img"><img src="${i.img}" class="gift-img" onerror="this.outerHTML='${i.emoji}'"></div>
+      <div class="ic-name">${i.name}</div>
+      <div class="ic-val">★ ${i.value}</div>
     </div>
   `).join('');
 
-  document.getElementById('resultCard').classList.add('hidden');
-  document.getElementById('spinnerWrap').style.display = 'none';
-
-  showSection('caseopen');
+  showPage('caseopen');
 }
 
 async function doOpen() {
   if (!currentCase) return;
-  if (balance < currentCase.price) {
-    toast('Not enough stars!');
-    return;
-  }
+  const c = (await api('/api/cases')).find(x => x.id === currentCase);
+  if (balance < c.price) { toast('Not enough stars! Go to Shop.'); return; }
 
-  const items = await api(`/api/case/${currentCase.id}/items`);
-  const wrap = document.getElementById('spinnerWrap');
-  const spinner = document.getElementById('spinner');
-  const resultCard = document.getElementById('resultCard');
+  const items = await api(`/api/case/${currentCase}/items`);
+  const wrap = document.getElementById('spinnerContainer');
+  const track = document.getElementById('spinnerTrack');
+  const btnWrap = document.getElementById('openBtnWrap');
+  const resultWrap = document.getElementById('resultWrap');
 
+  btnWrap.innerHTML = `<button class="btn btn-pink" disabled style="opacity:.5">Opening...</button>`;
+  resultWrap.innerHTML = '';
   wrap.style.display = 'block';
-  resultCard.classList.add('hidden');
 
-  // Build spin items
   const spinItems = [];
-  for (let i = 0; i < 40; i++) {
-    const ri = items[Math.floor(Math.random() * items.length)];
-    spinItems.push(ri);
+  for (let i = 0; i < 30; i++) {
+    spinItems.push(items[Math.floor(Math.random() * items.length)]);
   }
 
-  spinner.innerHTML = spinItems.map(i => `
+  track.style.transition = 'none';
+  track.style.transform = 'translateX(0)';
+  track.innerHTML = spinItems.map(i => `
     <div class="spin-item rarity-${i.rarity}">
-      <div class="si-emoji">${i.emoji}</div>
+      <div class="si-img"><img src="${i.img}" class="spin-img" onerror="this.outerHTML='${i.emoji}'"></div>
       <div class="si-name">${i.name}</div>
       <div class="si-val">★ ${i.value}</div>
     </div>
   `).join('');
 
-  spinner.style.transition = 'none';
-  spinner.style.transform = 'translateX(0)';
+  await new Promise(r => setTimeout(r, 100));
 
-  await sleep(100);
-
-  // Real result from server
-  const res = await api(`/api/open/${currentCase.id}`, {
+  const res = await api(`/api/open/${currentCase}`, {
     method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({uid})
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ uid })
   });
 
   if (res.error) {
     toast(res.error);
+    btnWrap.innerHTML = `<button class="btn btn-pink" onclick="doOpen()">Open Case</button>`;
     return;
   }
 
-  // Replace last item with real result
   const realIdx = spinItems.length - 5;
   spinItems[realIdx] = res.item;
-  spinner.innerHTML = spinItems.map(i => `
+  track.innerHTML = spinItems.map(i => `
     <div class="spin-item rarity-${i.rarity}">
-      <div class="si-emoji">${i.emoji}</div>
+      <div class="si-img"><img src="${i.img}" class="spin-img" onerror="this.outerHTML='${i.emoji}'"></div>
       <div class="si-name">${i.name}</div>
       <div class="si-val">★ ${i.value}</div>
     </div>
   `).join('');
 
-  const itemWidth = 88;
-  const offset = -(realIdx * itemWidth);
-  spinner.style.transition = 'transform 4s cubic-bezier(.17,.67,.12,.99)';
-  spinner.style.transform = `translateX(${offset}px)`;
+  const itemW = 91;
+  const offset = -(realIdx * itemW) + (wrap.offsetWidth / 2) - (itemW / 2);
+  track.style.transition = 'transform 3.5s cubic-bezier(.15,.8,.2,1)';
+  track.style.transform = `translateX(${offset}px)`;
 
-  await sleep(4200);
+  await new Promise(r => setTimeout(r, 3800));
 
   balance = res.balance;
-  document.getElementById('balance').textContent = `★ ${balance.toLocaleString()}`;
+  inventory.push(res.item);
+  updateBalances();
 
-  const profitClass = res.profit >= 0 ? 'win' : 'lose';
-  const profitSign = res.profit >= 0 ? '+' : '';
-  resultCard.innerHTML = `
-    <div class="rc-emoji">${res.item.emoji}</div>
-    <div class="rc-name" style="color:var(--${res.item.rarity})">${res.item.name}</div>
-    <div class="rc-value">★ ${res.item.value} • ${res.item.rarity}</div>
-    <div class="rc-profit ${profitClass}">${profitSign}${res.profit} stars</div>
-    <div class="rc-actions">
-      <button class="btn-accent btn-sm" onclick="doOpen()">Open Again</button>
-      <button class="btn-gold btn-sm" onclick="showCases()">Back</button>
+  const pc = res.profit >= 0 ? 'win' : 'lose';
+  const ps = res.profit >= 0 ? '+' : '';
+  resultWrap.innerHTML = `
+    <div class="result-card">
+      <div class="result-img"><img src="${res.item.img}" class="result-gift-img" onerror="this.outerHTML='${res.item.emoji}'"></div>
+      <div class="result-name" style="color:var(--${res.item.rarity})">${res.item.name}</div>
+      <div class="result-meta">★ ${res.item.value} · ${res.item.rarity}</div>
+      <div class="result-profit ${pc}">${ps}${res.profit} ★</div>
+    </div>
+    <div class="actions-row">
+      <button class="btn btn-pink btn-sm" onclick="doOpen()">Open Again</button>
+      <button class="btn btn-outline btn-sm" onclick="showPage('cases')">Back</button>
     </div>
   `;
-  resultCard.classList.remove('hidden');
 }
 
-function showCases() {
-  showSection('cases');
+// PROFILE
+function loadProfile() {
+  document.getElementById('profileBalance').textContent = balance.toLocaleString();
 }
 
-// UPGRADE
-let upgradeItem = null;
-
-async function loadUpgradeItems() {
-  const inv = inventory.filter(i => i.value < 5000);
-  const el = document.getElementById('upgradeItems');
-  if (inv.length === 0) {
-    el.innerHTML = '<div class="empty"><div class="e-icon">📦</div>No items to upgrade</div>';
-    return;
-  }
-  el.innerHTML = inv.map((item, idx) => `
-    <div class="upg-item rarity-${item.rarity}" onclick="selectUpgrade(${idx})">
-      <div class="ui-emoji">${item.emoji}</div>
-      <div class="ui-name">${item.name}</div>
-      <div class="ui-val">★ ${item.value}</div>
-    </div>
-  `).join('');
-  document.getElementById('upgradeVisual').classList.add('hidden');
-  document.getElementById('upgradeInfo').classList.add('hidden');
-  document.getElementById('upgradeBtn').classList.add('hidden');
-  document.getElementById('upgradeResult').classList.add('hidden');
-}
-
-function selectUpgrade(idx) {
-  const item = inventory[idx];
-  upgradeItem = {...item, idx};
-
-  const targets = [25,50,100,200,500,1000];
-  let target = null;
-  for (const t of targets) {
-    if (t > item.value) { target = t; break; }
-  }
-  if (!target) { toast('No upgrade path'); return; }
-
-  const table = {25:{chance:50},50:{chance:50},100:{chance:50},200:{chance:40},500:{chance:33},1000:{chance:25}};
-  const chance = table[target]?.chance || 50;
-  const bet = Math.floor(item.value * 0.8);
-
-  document.getElementById('upgradeFromVal').textContent = `★ ${item.value}`;
-  document.getElementById('upgradeToVal').textContent = `★ ${target}`;
-  document.getElementById('upgradeBet').textContent = `★ ${bet}`;
-  document.getElementById('upgradeChance').textContent = `${chance}%`;
-  document.getElementById('upgradeVisual').classList.remove('hidden');
-  document.getElementById('upgradeInfo').classList.remove('hidden');
-  document.getElementById('upgradeBtn').classList.remove('hidden');
-  document.getElementById('upgradeResult').classList.add('hidden');
-}
-
-async function doUpgrade() {
-  if (!upgradeItem) return;
-  const res = await api('/api/upgrade', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({uid, item_value: upgradeItem.value})
-  });
-  if (res.error) { toast(res.error); return; }
-
-  balance = res.balance;
-  document.getElementById('balance').textContent = `★ ${balance.toLocaleString()}`;
-
-  const resultEl = document.getElementById('upgradeResult');
-  if (res.success) {
-    resultEl.innerHTML = `<div style="color:var(--green);font-weight:700;font-size:16px">🎉 Upgrade Success! ★ ${res.target}</div>`;
-    inventory.push(res.new_item);
-  } else {
-    resultEl.innerHTML = `<div style="color:var(--red);font-weight:700;font-size:16px">❌ Failed! Item lost.</div>`;
-    inventory.splice(upgradeItem.idx, 1);
-  }
-  resultEl.classList.remove('hidden');
-  loadUpgradeItems();
-}
-
-// SHOP
-async function loadPacks() {
-  const packs = await api('/api/shop/packs');
-  const grid = document.getElementById('packGrid');
-  grid.innerHTML = packs.map((p, i) => `
-    <div class="pack-card${i===2?' best':''}" onclick="selectPack(${p.stars})">
-      <div class="pack-stars">★ ${p.stars}</div>
-      <div class="pack-price">$${p.usd}</div>
-      ${p.bonus ? `<div class="pack-bonus">+${p.bonus}% bonus</div>` : ''}
-      <div class="pack-alt">€${p.eur} • ₽${p.rub} • £${p.gbp}</div>
-    </div>
-  `).join('');
-}
-
-async function loadMethods() {
-  const methods = await api('/api/shop/methods');
-  const list = document.getElementById('methodsList');
-  list.innerHTML = methods.map(m => `
-    <div class="method-card">
-      <div class="m-icon">${m.icon}</div>
-      <div>
-        <div class="m-name">${m.name}</div>
-        <div class="m-desc">${m.desc}</div>
-      </div>
-    </div>
-  `).join('');
-}
-
-function selectPack(stars) {
-  selectedPack = stars;
-  const modal = document.getElementById('buyModal');
-  document.getElementById('modalTitle').textContent = `Buy ★ ${stars}`;
-  const packs = [
-    {s:100,u:'$2.50'},{s:250,u:'$6.50'},{s:500,u:'$13.00'},{s:1000,u:'$20.00'}
-  ];
-  const p = packs.find(x => x.s === stars);
-  document.getElementById('modalPrice').textContent = p ? p.u : '';
-
-  const methods = [
-    {id:'card',icon:'💳',name:'Bank Card'},
-    {id:'crypto',icon:'₿',name:'Crypto (USDT/BTC/ETH)'},
-    {id:'qiwi',icon:'🥝',name:'QIWI'},
-    {id:'sbp',icon:'📱',name:'SBP'},
-  ];
-  document.getElementById('modalMethods').innerHTML = methods.map(m => `
-    <div class="modal-method" onclick="buyStars('${m.id}')">
-      <div class="mm-icon">${m.icon}</div>
-      <div class="mm-name">${m.name}</div>
-    </div>
-  `).join('');
-
-  modal.classList.remove('hidden');
-}
-
-function closeModal() {
-  document.getElementById('buyModal').classList.add('hidden');
-}
-
-async function buyStars(method) {
-  if (!selectedPack) return;
-  closeModal();
-  toast('Processing payment...');
-  await sleep(1500);
-
-  const res = await api('/api/shop/buy', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({uid, stars: selectedPack, method})
-  });
-
-  if (res.error) { toast(res.error); return; }
-  balance = res.balance;
-  document.getElementById('balance').textContent = `★ ${balance.toLocaleString()}`;
-  toast(`+${res.stars_added} stars added!${res.bonus ? ' (+'+res.bonus+' bonus)' : ''}`);
-}
-
-// INVENTORY
 async function loadInventory() {
   const data = await api(`/api/inventory/${uid}`);
-  inventory = data;
   const el = document.getElementById('invList');
-  if (data.length === 0) {
-    el.innerHTML = '<div class="empty"><div class="e-icon">📦</div>Your inventory is empty.<br>Open some cases!</div>';
+  if (!data.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-text">No items yet. Open some cases!</div></div>';
     return;
   }
-  el.innerHTML = data.map((item, idx) => `
+  el.innerHTML = data.slice(-20).reverse().map((item, idx) => `
     <div class="inv-item rarity-${item.rarity}">
-      <div class="ii-emoji">${item.emoji}</div>
-      <div class="ii-info">
-        <div class="ii-name">${item.name}</div>
-        <div class="ii-from">${item.from_case} • ${item.rarity}</div>
+      <div class="inv-img"><img src="${item.img}" class="inv-gift-img" onerror="this.outerHTML='${item.emoji}'"></div>
+      <div class="inv-info">
+        <div class="inv-name">${item.name}</div>
+        <div class="inv-from">${item.from_case || ''} · ${item.rarity}</div>
       </div>
-      <div class="ii-val">★ ${item.value}</div>
-      <div class="ii-sell" onclick="sellItem(${idx})">Sell</div>
+      <div class="inv-right">
+        <div class="inv-val">★ ${item.value}</div>
+        <div class="inv-sell" onclick="sellItem(${data.length - 1 - idx})">Sell</div>
+      </div>
     </div>
   `).join('');
 }
@@ -347,28 +211,143 @@ async function loadInventory() {
 async function sellItem(idx) {
   const res = await api('/api/sell', {
     method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({uid, index: idx})
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ uid, index: idx })
   });
   if (res.error) { toast(res.error); return; }
   balance = res.balance;
-  document.getElementById('balance').textContent = `★ ${balance.toLocaleString()}`;
+  updateBalances();
   toast(`Sold for ★ ${res.sold.value}`);
   loadInventory();
+  loadHistory();
+}
+
+async function loadHistory() {
+  const data = await api(`/api/history/${uid}`);
+  const el = document.getElementById('historyList');
+  if (!data.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-text">No history yet</div></div>';
+    return;
+  }
+  el.innerHTML = data.slice(-10).reverse().map(h => {
+    const pc = h.profit >= 0 ? 'win' : 'lose';
+    const ps = h.profit >= 0 ? '+' : '';
+    return `
+      <div class="history-item">
+        <div class="hi-left">
+          <div class="hi-name">${h.item}</div>
+          <div class="hi-case">${h.case}</div>
+        </div>
+        <div class="hi-profit ${pc}">${ps}${h.profit} ★</div>
+      </div>
+    `;
+  }).join('');
+
+  const stats = await api(`/api/stats/${uid}`);
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-val">${stats.total_opened}</div><div class="stat-label">Opened</div></div>
+    <div class="stat-card"><div class="stat-val">${stats.items_count}</div><div class="stat-label">Items</div></div>
+    <div class="stat-card"><div class="stat-val">★ ${stats.total_spent}</div><div class="stat-label">Spent</div></div>
+  `;
+}
+
+// SHOP
+let currentOrderId = null;
+
+async function loadShop() {
+  const [packs, wallet] = await Promise.all([
+    api('/api/shop/packs'),
+    api('/api/shop/wallet'),
+  ]);
+
+  document.getElementById('packGrid').innerHTML = packs.map((p, i) => `
+    <div class="pack-card${i === 2 ? ' best' : ''}" onclick="selectPack(${p.stars})">
+      <div class="pack-stars">★ ${p.stars}</div>
+      <div class="pack-price">$${p.usd} USDT</div>
+      ${p.bonus ? `<div class="pack-bonus">+${p.bonus}% bonus</div>` : ''}
+      <div class="pack-alt">≈ ₽${p.rub} · ≈ €${p.eur}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('payList').innerHTML = `
+    <div class="pay-card">
+      <div class="pay-icon">₮</div>
+      <div><div class="pay-name">USDT (TRC20)</div><div class="pay-desc">Tron Network · ${wallet.address.slice(0,8)}...${wallet.address.slice(-6)}</div></div>
+    </div>
+  `;
+}
+
+async function selectPack(stars) {
+  const res = await api('/api/pay/create', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ uid, pack_stars: stars })
+  });
+  if (res.error) { toast(res.error); return; }
+
+  currentOrderId = res.order_id;
+  document.getElementById('modalTitle').textContent = `Buy ★ ${stars}`;
+  document.getElementById('modalPrice').textContent = `${res.amount_usdt} USDT`;
+
+  document.getElementById('modalMethods').innerHTML = `
+    <div class="pay-step">
+      <div class="pay-step-num">1</div>
+      <div class="pay-step-text">Send exactly <strong>${res.amount_usdt} USDT</strong> to:</div>
+      <div class="pay-address" onclick="copyAddress('${res.wallet}')">${res.wallet}</div>
+      <div class="pay-step-hint">Tap address to copy · Network: TRC20 only</div>
+    </div>
+    <div class="pay-step">
+      <div class="pay-step-num">2</div>
+      <div class="pay-step-text">Paste your TX hash:</div>
+      <input type="text" class="pay-input" id="txHashInput" placeholder="Enter transaction hash..." autocomplete="off">
+    </div>
+    <button class="btn btn-pink" onclick="verifyPayment()">Verify Payment</button>
+    <div id="payStatus"></div>
+  `;
+
+  document.getElementById('payModal').classList.remove('hidden');
+}
+
+function copyAddress(addr) {
+  navigator.clipboard.writeText(addr).then(() => toast('Address copied!'));
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('payModal')) {
+    document.getElementById('payModal').classList.add('hidden');
+  }
+}
+
+async function verifyPayment() {
+  const txHash = document.getElementById('txHashInput')?.value?.trim();
+  if (!txHash) { toast('Enter transaction hash'); return; }
+  if (!currentOrderId) { toast('No active order'); return; }
+
+  const statusEl = document.getElementById('payStatus');
+  statusEl.innerHTML = '<div class="pay-verifying">Verifying...</div>';
+
+  const res = await api('/api/pay/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ uid, order_id: currentOrderId, tx_hash: txHash })
+  });
+
+  if (res.error) {
+    statusEl.innerHTML = `<div class="pay-error">${res.error}</div>`;
+    return;
+  }
+
+  balance = res.balance;
+  updateBalances();
+  document.getElementById('payModal').classList.add('hidden');
+  currentOrderId = null;
+  toast(`+${res.stars_added} stars${res.bonus ? ' (+' + res.bonus + ' bonus)' : ''}`);
 }
 
 // HELPERS
-function showSection(name) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById('sec-' + name).classList.add('active');
-}
-
 function toast(msg) {
-  let t = document.querySelector('.toast');
-  if (!t) { t = document.createElement('div'); t.className='toast'; document.body.appendChild(t); }
+  const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
 }
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }

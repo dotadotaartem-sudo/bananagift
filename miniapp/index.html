@@ -3,97 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Exitency Bot</title>
+<title>BananGift</title>
 <link rel="stylesheet" href="css/style.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
+<div class="bg-anim"></div>
 <div id="app">
-  <header class="top-bar">
-    <div class="top-left">
-      <span class="logo-icon">рџ’Ћ</span>
-      <span class="logo-text">Exitency</span>
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-logo">BananGift</span>
     </div>
-    <div class="top-right">
-      <span class="balance" id="balance">в… 0</span>
+    <div class="topbar-right" id="topStars" style="display:none" onclick="showPage('shop')">
+      <span class="star-icon">★</span>
+      <span class="star-count" id="topBalance">0</span>
+      <span class="stars-plus" onclick="showPage('shop')">+</span>
     </div>
   </header>
 
-  <main id="main">
-    <!-- TABS -->
-    <nav class="tabs">
-      <button class="tab active" data-tab="cases">рџЋЃ Cases</button>
-      <button class="tab" data-tab="upgrade">в¬†пёЏ Upgrade</button>
-      <button class="tab" data-tab="shop">рџ’° Shop</button>
-      <button class="tab" data-tab="inventory">рџ“¦ Inventory</button>
-    </nav>
+  <main>
+    <div class="page active" id="page-cases">
+      <div class="page-title">Cases</div>
+      <div class="cases-grid" id="caseList"></div>
+    </div>
 
-    <!-- CASES -->
-    <section id="sec-cases" class="section active">
-      <div class="section-title">Open Cases</div>
-      <div class="case-grid" id="caseGrid"></div>
-    </section>
-
-    <!-- CASE OPEN VIEW -->
-    <section id="sec-caseopen" class="section hidden">
-      <button class="back-btn" onclick="showCases()">в†ђ Back</button>
-      <div class="case-open-header" id="caseOpenHeader"></div>
-      <div class="spinner-wrap" id="spinnerWrap">
-        <div class="spinner" id="spinner"></div>
+    <div class="page" id="page-caseopen">
+      <button class="back-btn" onclick="showPage('cases')">← Back</button>
+      <div class="case-open-top" id="caseOpenTop"></div>
+      <div class="spinner-container" id="spinnerContainer" style="display:none">
+        <div class="spinner-line"></div>
+        <div class="spinner-track" id="spinnerTrack"></div>
       </div>
-      <div class="result-card hidden" id="resultCard"></div>
-      <button class="btn-gold" id="openBtn" onclick="doOpen()" style="display:block;margin:0 auto 20px">Open Case</button><div class="case-items-list" id="caseItemsList"></div>
-    </section>
-
-    <!-- UPGRADE -->
-    <section id="sec-upgrade" class="section hidden">
-      <div class="section-title">Upgrade Items</div>
-      <div class="upgrade-from" id="upgradeFrom">
-        <div class="upgrade-label">Select item to upgrade:</div>
-        <div class="upgrade-items" id="upgradeItems"></div>
+      <div id="openBtnWrap" style="margin-bottom:16px">
+        <button class="btn btn-pink" onclick="doOpen()">Open Case</button>
       </div>
-      <div class="upgrade-visual hidden" id="upgradeVisual">
-        <div class="upgrade-circle from" id="upgradeFromCircle">
-          <span class="uv-val" id="upgradeFromVal">в… 0</span>
-          <span class="uv-lbl">Your item</span>
+      <div id="resultWrap"></div>
+      <div class="items-title">Case contents</div>
+      <div class="items-grid" id="caseItemsGrid"></div>
+    </div>
+
+    <div class="page" id="page-shop">
+      <div class="section-title">Shop</div>
+      <div id="packGrid"></div>
+      <div class="pay-title">Payment</div>
+      <div class="pay-list" id="payList"></div>
+    </div>
+
+    <div class="page" id="page-profile">
+      <div class="profile-card">
+        <div class="profile-avatar" id="profileAvatar">🍌</div>
+        <div class="profile-name" id="profileName">User</div>
+        <div class="profile-id" id="profileId">ID: 0</div>
+      </div>
+      <div class="profile-stars" onclick="showPage('shop')">
+        <div class="ps-left">
+          <span class="ps-icon">★</span>
+          <span class="ps-count" id="profileBalance">0</span>
+          <span class="ps-label">stars</span>
         </div>
-        <div class="upgrade-arrow">в†’</div>
-        <div class="upgrade-circle to" id="upgradeToCircle">
-          <span class="uv-val" id="upgradeToVal">в… 0</span>
-          <span class="uv-lbl">Target</span>
-        </div>
-      </div>
-      <div class="upgrade-info hidden" id="upgradeInfo">
-        <div>Bet: <span id="upgradeBet">в… 0</span></div>
-        <div>Chance: <span id="upgradeChance">0%</span></div>
-      </div>
-      <button class="btn-gold hidden" id="upgradeBtn" onclick="doUpgrade()">в¬†пёЏ Upgrade</button>
-      <div class="upgrade-result hidden" id="upgradeResult"></div>
-    </section>
-
-    <!-- SHOP -->
-    <section id="sec-shop" class="section hidden">
-      <div class="section-title">Buy Stars</div>
-      <div class="pack-grid" id="packGrid"></div>
-      <div class="section-title" style="margin-top:24px">Payment Methods</div>
-      <div class="methods-list" id="methodsList"></div>
-      <div class="buy-modal hidden" id="buyModal">
-        <div class="modal-card">
-          <div class="modal-title" id="modalTitle">Buy в… 100</div>
-          <div class="modal-price" id="modalPrice">$2.50</div>
-          <div class="modal-methods" id="modalMethods"></div>
-          <button class="btn-close" onclick="closeModal()">Cancel</button>
+        <div class="ps-right">
+          <div class="ps-plus" onclick="showPage('shop')">+</div>
+          <span class="ps-hint">Top up</span>
         </div>
       </div>
-    </section>
-
-    <!-- INVENTORY -->
-    <section id="sec-inventory" class="section hidden">
-      <div class="section-title">Your Items</div>
-      <div class="inv-list" id="invList"></div>
-    </section>
+      <div class="stats-grid" id="statsGrid"></div>
+      <div class="section-title" style="margin-top:16px">Inventory</div>
+      <div id="invList"></div>
+      <div class="section-title" style="margin-top:16px">History</div>
+      <div id="historyList"></div>
+    </div>
   </main>
+
+  <nav class="bottomnav">
+    <div class="nav-item active" onclick="showPage('cases')" data-page="cases">
+      <span class="nav-icon">🎁</span>
+      <span class="nav-label">Cases</span>
+    </div>
+    <div class="nav-item" onclick="showPage('profile')" data-page="profile">
+      <span class="nav-icon">👤</span>
+      <span class="nav-label">Profile</span>
+    </div>
+  </nav>
 </div>
+
+<div class="modal-overlay hidden" id="payModal" onclick="closeModal(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle">Buy Stars</div>
+    <div class="modal-price" id="modalPrice"></div>
+    <div id="modalMethods"></div>
+    <button class="modal-cancel" onclick="document.getElementById('payModal').classList.add('hidden')">Cancel</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 <script src="js/app.js"></script>
 </body>
 </html>
