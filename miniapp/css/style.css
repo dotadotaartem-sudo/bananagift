@@ -44,10 +44,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif
 .page-title{font-size:20px;font-weight:900;margin-bottom:14px;color:var(--text)}
 .section-title{font-size:16px;font-weight:800;margin-bottom:12px;color:var(--text)}
 
-/* HERO BANNER */
-.hero-banner{margin:0 -14px 14px;border-radius:0 0 var(--radius) var(--radius);overflow:hidden;max-height:200px}
-.hero-img{width:100%;height:200px;object-fit:cover;display:block;mask-image:linear-gradient(to bottom,black 60%,transparent);-webkit-mask-image:linear-gradient(to bottom,black 60%,transparent)}
-
 /* CASES GRID */
 .cases-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
@@ -55,7 +51,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif
 .case-card{background:var(--bg2);border-radius:var(--radius);padding:14px 10px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;border:1px solid rgba(168,85,247,.08);cursor:pointer;transition:.15s;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 .case-card:active{transform:scale(.96);box-shadow:0 1px 4px rgba(0,0,0,.3);border-color:rgba(34,211,238,.3)}
 .case-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.case-img{width:48px;height:48px;image-rendering:auto;border-radius:8px}
+.case-img{width:48px;height:48px;object-fit:contain;border-radius:8px}
 .case-name{font-size:12px;font-weight:700;line-height:1.2}
 .case-meta{font-size:10px;color:var(--text2)}
 .case-price{font-size:13px;font-weight:800;color:var(--accent)}
@@ -65,7 +61,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif
 .back-btn{display:flex;align-items:center;gap:4px;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;padding:12px 0;margin-bottom:8px;background:none;border:none}
 .case-open-top{text-align:center;margin-bottom:16px}
 .case-open-icon{width:72px;height:72px;margin:0 auto;overflow:hidden}
-.case-open-img{width:72px;height:72px;image-rendering:auto;border-radius:12px}
+.case-open-img{width:72px;height:72px;object-fit:contain;border-radius:12px}
 .case-open-name{font-size:17px;font-weight:800;margin-top:6px}
 .case-open-price{font-size:12px;color:var(--accent);font-weight:600;margin-top:2px}
 
@@ -80,14 +76,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif
 .spinner-track{display:flex;gap:6px;padding:10px 0;transition:transform 3.5s cubic-bezier(.15,.8,.2,1)}
 .spin-item{min-width:85px;height:90px;border-radius:10px;background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid rgba(168,85,247,.08)}
 .spin-item .si-img{width:36px;height:36px;overflow:hidden}
-.spin-item .spin-img{width:36px;height:36px;image-rendering:auto}
+.spin-item .spin-img{width:36px;height:36px;object-fit:contain}
 .spin-item .si-name{font-size:8px;color:var(--text2);margin-top:4px;text-align:center;max-width:75px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .spin-item .si-val{font-size:10px;font-weight:700;color:var(--accent)}
 
 /* RESULT */
 .result-card{text-align:center;padding:20px;background:var(--bg2);border-radius:var(--radius);margin-bottom:14px;border:1px solid rgba(168,85,247,.08);box-shadow:0 4px 16px rgba(0,0,0,.15)}
 .result-img{width:64px;height:64px;margin:0 auto;overflow:hidden}
-.result-gift-img{width:64px;height:64px;image-rendering:auto;border-radius:10px}
+.result-gift-img{width:64px;height:64px;object-fit:contain;border-radius:10px}
 .result-name{font-size:16px;font-weight:800;margin-top:8px}
 .result-meta{font-size:12px;color:var(--text2);margin-top:4px}
 .result-profit{font-size:13px;font-weight:700;margin-top:6px}
@@ -99,7 +95,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif
 .items-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .item-card{background:var(--bg2);border-radius:10px;padding:10px 6px;text-align:center;border:1px solid rgba(168,85,247,.06)}
 .item-card .ic-img{width:36px;height:36px;margin:0 auto;overflow:hidden}
-.item-card .gift-img{width:36px;height:36px;image-rendering:auto}
+.item-card .gift-img{width:36px;height:36px;object-fit:contain}
 .item-card .ic-name{font-size:9px;color:var(--text2);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .item-card .ic-val{font-size:10px;font-weight:700;color:var(--accent);margin-top:2px}
 
@@ -146,7 +142,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif
 /* INVENTORY */
 .inv-item{background:var(--bg2);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;border:1px solid rgba(168,85,247,.06);margin-bottom:6px}
 .inv-img{width:36px;height:36px;flex-shrink:0;overflow:hidden}
-.inv-gift-img{width:36px;height:36px;image-rendering:auto;border-radius:6px}
+.inv-gift-img{width:36px;height:36px;object-fit:contain;border-radius:6px}
 .inv-info{flex:1}
 .inv-name{font-size:12px;font-weight:600}
 .inv-from{font-size:10px;color:var(--text2)}
