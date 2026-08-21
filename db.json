@@ -1,7 +1,7 @@
 {
   "users": {
     "8989575087": {
-      "stars": 985,
+      "stars": 935,
       "inventory": [
         {
           "name": "Heart",
@@ -29,6 +29,15 @@
           "rarity": "common",
           "from_case": "Super Summer Capsule",
           "time": "2026-08-21T13:00:06.051Z"
+        },
+        {
+          "name": "Sakura",
+          "emoji": "🌸",
+          "img": "/img/gifts/sakura.webp",
+          "value": 3,
+          "rarity": "common",
+          "from_case": "Fresh Case",
+          "time": "2026-08-21T13:00:15.084Z"
         }
       ],
       "history": [
@@ -52,10 +61,17 @@
           "value": 1,
           "profit": -4,
           "time": "2026-08-21T13:00:06.051Z"
+        },
+        {
+          "case": "Fresh Case",
+          "item": "Sakura",
+          "value": 3,
+          "profit": -47,
+          "time": "2026-08-21T13:00:15.084Z"
         }
       ],
-      "total_opened": 3,
-      "total_spent": 15,
+      "total_opened": 4,
+      "total_spent": 65,
       "joined": "2026-08-21T08:28:36.813Z"
     }
   }
