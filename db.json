@@ -1,7 +1,7 @@
 {
   "users": {
     "8989575087": {
-      "stars": 935,
+      "stars": 836,
       "inventory": [
         {
           "name": "Heart",
@@ -38,6 +38,15 @@
           "rarity": "common",
           "from_case": "Fresh Case",
           "time": "2026-08-21T13:00:15.084Z"
+        },
+        {
+          "name": "Plush Pepe",
+          "emoji": "🐸",
+          "img": "/img/gifts/pepe.webp",
+          "value": 300,
+          "rarity": "legendary",
+          "from_case": "Elite Case",
+          "time": "2026-08-21T16:29:10.324Z"
         }
       ],
       "history": [
@@ -68,10 +77,17 @@
           "value": 3,
           "profit": -47,
           "time": "2026-08-21T13:00:15.084Z"
+        },
+        {
+          "case": "Elite Case",
+          "item": "Plush Pepe",
+          "value": 300,
+          "profit": 201,
+          "time": "2026-08-21T16:29:10.324Z"
         }
       ],
-      "total_opened": 4,
-      "total_spent": 65,
+      "total_opened": 5,
+      "total_spent": 164,
       "joined": "2026-08-21T08:28:36.813Z"
     },
     "6312812921": {
