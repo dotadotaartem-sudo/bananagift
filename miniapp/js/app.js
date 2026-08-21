@@ -103,7 +103,7 @@ async function openCase(cid) {
 async function doOpen() {
   if (!currentCase) return;
   const c = (await api('/api/cases')).find(x => x.id === currentCase);
-  if (balance < c.price) { toast('Not enough stars! Go to Shop.'); return; }
+  if (balance < c.price) { toast('Недостаточно звёзд! Иди в магазин.'); return; }
 
   const items = await api(`/api/case/${currentCase}/items`);
   const wrap = document.getElementById('spinnerContainer');
@@ -111,7 +111,7 @@ async function doOpen() {
   const btnWrap = document.getElementById('openBtnWrap');
   const resultWrap = document.getElementById('resultWrap');
 
-  btnWrap.innerHTML = `<button class="btn btn-pink" disabled style="opacity:.5">Opening...</button>`;
+  btnWrap.innerHTML = `<button class="btn btn-pink" disabled style="opacity:.5">Открывается...</button>`;
   resultWrap.innerHTML = '';
   wrap.style.display = 'block';
 
@@ -140,7 +140,7 @@ async function doOpen() {
 
   if (res.error) {
     toast(res.error);
-    btnWrap.innerHTML = `<button class="btn btn-pink" onclick="doOpen()">Open Case</button>`;
+    btnWrap.innerHTML = `<button class="btn btn-pink" onclick="doOpen()">Открыть кейс</button>`;
     return;
   }
 
@@ -175,8 +175,8 @@ async function doOpen() {
       <div class="result-profit ${pc}">${ps}${res.profit} ★</div>
     </div>
     <div class="actions-row">
-      <button class="btn btn-pink btn-sm" onclick="doOpen()">Open Again</button>
-      <button class="btn btn-outline btn-sm" onclick="showPage('cases')">Back</button>
+      <button class="btn btn-pink btn-sm" onclick="doOpen()">Открыть ещё</button>
+      <button class="btn btn-outline btn-sm" onclick="showPage('cases')">Назад</button>
     </div>
   `;
 }
@@ -190,7 +190,7 @@ async function loadInventory() {
   const data = await api(`/api/inventory/${uid}`);
   const el = document.getElementById('invList');
   if (!data.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-text">No items yet. Open some cases!</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-text">Пока нет предметов. Открой кейсы!</div></div>';
     return;
   }
   el.innerHTML = data.slice(-20).reverse().map((item, idx) => `
@@ -202,7 +202,7 @@ async function loadInventory() {
       </div>
       <div class="inv-right">
         <div class="inv-val">★ ${item.value}</div>
-        <div class="inv-sell" onclick="sellItem(${data.length - 1 - idx})">Sell</div>
+        <div class="inv-sell" onclick="sellItem(${data.length - 1 - idx})">Продать</div>
       </div>
     </div>
   `).join('');
@@ -217,7 +217,7 @@ async function sellItem(idx) {
   if (res.error) { toast(res.error); return; }
   balance = res.balance;
   updateBalances();
-  toast(`Sold for ★ ${res.sold.value}`);
+  toast(`Продано за ★ ${res.sold.value}`);
   loadInventory();
   loadHistory();
 }
@@ -226,7 +226,7 @@ async function loadHistory() {
   const data = await api(`/api/history/${uid}`);
   const el = document.getElementById('historyList');
   if (!data.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-text">No history yet</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-text">История пуста</div></div>';
     return;
   }
   el.innerHTML = data.slice(-10).reverse().map(h => {
@@ -245,9 +245,9 @@ async function loadHistory() {
 
   const stats = await api(`/api/stats/${uid}`);
   document.getElementById('statsGrid').innerHTML = `
-    <div class="stat-card"><div class="stat-val">${stats.total_opened}</div><div class="stat-label">Opened</div></div>
-    <div class="stat-card"><div class="stat-val">${stats.items_count}</div><div class="stat-label">Items</div></div>
-    <div class="stat-card"><div class="stat-val">★ ${stats.total_spent}</div><div class="stat-label">Spent</div></div>
+    <div class="stat-card"><div class="stat-val">${stats.total_opened}</div><div class="stat-label">Открыто</div></div>
+    <div class="stat-card"><div class="stat-val">${stats.items_count}</div><div class="stat-label">Предметов</div></div>
+    <div class="stat-card"><div class="stat-val">★ ${stats.total_spent}</div><div class="stat-label">Потрачено</div></div>
   `;
 }
 
@@ -264,7 +264,7 @@ async function loadShop() {
     <div class="pack-card${i === 2 ? ' best' : ''}" onclick="selectPack(${p.stars})">
       <div class="pack-stars">★ ${p.stars}</div>
       <div class="pack-price">$${p.usd} USDT</div>
-      ${p.bonus ? `<div class="pack-bonus">+${p.bonus}% bonus</div>` : ''}
+      ${p.bonus ? `<div class="pack-bonus">+${p.bonus}% бонус</div>` : ''}
       <div class="pack-alt">≈ ₽${p.rub} · ≈ €${p.eur}</div>
     </div>
   `).join('');
@@ -286,22 +286,22 @@ async function selectPack(stars) {
   if (res.error) { toast(res.error); return; }
 
   currentOrderId = res.order_id;
-  document.getElementById('modalTitle').textContent = `Buy ★ ${stars}`;
+  document.getElementById('modalTitle').textContent = `Купить ★ ${stars}`;
   document.getElementById('modalPrice').textContent = `${res.amount_usdt} USDT`;
 
   document.getElementById('modalMethods').innerHTML = `
     <div class="pay-step">
       <div class="pay-step-num">1</div>
-      <div class="pay-step-text">Send exactly <strong>${res.amount_usdt} USDT</strong> to:</div>
+      <div class="pay-step-text">Отправьте ровно <strong>${res.amount_usdt} USDT</strong> на:</div>
       <div class="pay-address" onclick="copyAddress('${res.wallet}')">${res.wallet}</div>
-      <div class="pay-step-hint">Tap address to copy · Network: TRC20 only</div>
+      <div class="pay-step-hint">Нажмите на адрес чтобы скопировать · Сеть: только TRC20</div>
     </div>
     <div class="pay-step">
       <div class="pay-step-num">2</div>
-      <div class="pay-step-text">Paste your TX hash:</div>
-      <input type="text" class="pay-input" id="txHashInput" placeholder="Enter transaction hash..." autocomplete="off">
+      <div class="pay-step-text">Вставьте TX хеш:</div>
+      <input type="text" class="pay-input" id="txHashInput" placeholder="Введите хеш транзакции..." autocomplete="off">
     </div>
-    <button class="btn btn-pink" onclick="verifyPayment()">Verify Payment</button>
+    <button class="btn btn-pink" onclick="verifyPayment()">Проверить оплату</button>
     <div id="payStatus"></div>
   `;
 
@@ -309,7 +309,7 @@ async function selectPack(stars) {
 }
 
 function copyAddress(addr) {
-  navigator.clipboard.writeText(addr).then(() => toast('Address copied!'));
+  navigator.clipboard.writeText(addr).then(() => toast('Адрес скопирован!'));
 }
 
 function closeModal(e) {
@@ -320,11 +320,11 @@ function closeModal(e) {
 
 async function verifyPayment() {
   const txHash = document.getElementById('txHashInput')?.value?.trim();
-  if (!txHash) { toast('Enter transaction hash'); return; }
-  if (!currentOrderId) { toast('No active order'); return; }
+  if (!txHash) { toast('Введите хеш транзакции'); return; }
+  if (!currentOrderId) { toast('Нет активного заказа'); return; }
 
   const statusEl = document.getElementById('payStatus');
-  statusEl.innerHTML = '<div class="pay-verifying">Verifying...</div>';
+  statusEl.innerHTML = '<div class="pay-verifying">Проверка...</div>';
 
   const res = await api('/api/pay/verify', {
     method: 'POST',
@@ -341,7 +341,7 @@ async function verifyPayment() {
   updateBalances();
   document.getElementById('payModal').classList.add('hidden');
   currentOrderId = null;
-  toast(`+${res.stars_added} stars${res.bonus ? ' (+' + res.bonus + ' bonus)' : ''}`);
+  toast(`+${res.stars_added} звёзд${res.bonus ? ' (+' + res.bonus + ' бонус)' : ''}`);
 }
 
 // HELPERS

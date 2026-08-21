@@ -38,17 +38,17 @@ async function handleUpdate(update) {
       const miniAppUrl = `${WEBAPP_URL}?uid=${chatId}`;
       await tg('sendMessage', {
         chat_id: chatId,
-        text: `Hey, ${firstName}!\n\nWelcome to BananGift!\nOpen cases, upgrade items & win rare gifts!`,
+        text: `Привет, ${firstName}!\n\nДобро пожаловать в BananGift!\nОткрывай кейсы, прокачивай предметы и выигрывай редкие подарки!`,
         reply_markup: {
           inline_keyboard: [
-            [{ text: '🎁 Open Bot', web_app: { url: miniAppUrl } }]
+            [{ text: '🎁 Открыть бот', web_app: { url: miniAppUrl } }]
           ]
         }
       });
     } else if (cmd === '/help') {
       await tg('sendMessage', {
         chat_id: chatId,
-        text: 'Commands:\n/start — Open the bot\n/myid — Your ID\n\nUse the Mini App for cases, shop and more!'
+        text: 'Команды:\n/start — Открыть бота\n/myid — Твой ID\n\nИспользуй мини-апп для кейсов, магазина и многого другого!'
       });
     } else if (cmd === '/addstars' && OWNER_IDS.includes(fromId)) {
       const parts = text.split(' ');
