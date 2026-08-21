@@ -1,7 +1,7 @@
 {
   "users": {
     "8989575087": {
-      "stars": 836,
+      "stars": 835,
       "inventory": [
         {
           "name": "Heart",
@@ -47,6 +47,15 @@
           "rarity": "legendary",
           "from_case": "Elite Case",
           "time": "2026-08-21T16:29:10.324Z"
+        },
+        {
+          "name": "Heart",
+          "emoji": "❤️",
+          "img": "/img/gifts/heart.png",
+          "value": 1,
+          "rarity": "common",
+          "from_case": "Star Case",
+          "time": "2026-08-21T16:49:45.582Z"
         }
       ],
       "history": [
@@ -84,10 +93,17 @@
           "value": 300,
           "profit": 201,
           "time": "2026-08-21T16:29:10.324Z"
+        },
+        {
+          "case": "Star Case",
+          "item": "Heart",
+          "value": 1,
+          "profit": 0,
+          "time": "2026-08-21T16:49:45.582Z"
         }
       ],
-      "total_opened": 5,
-      "total_spent": 164,
+      "total_opened": 6,
+      "total_spent": 165,
       "joined": "2026-08-21T08:28:36.813Z"
     },
     "6312812921": {
