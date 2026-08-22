@@ -81,6 +81,7 @@ app.use(express.static(path.join(__dirname, 'miniapp')));
 let pollingOffset = 0;
 let pollingActive = false;
 let pollErrors = 0;
+let pollTimer = null;
 
 async function pollUpdates() {
   if (pollingActive) return;
@@ -107,7 +108,14 @@ async function pollUpdates() {
   }
   pollingActive = false;
   const delay = pollErrors > 5 ? 5000 : 1000;
-  setTimeout(pollUpdates, delay);
+  pollTimer = setTimeout(pollUpdates, delay);
+}
+
+function restartPolling() {
+  if (pollTimer) clearTimeout(pollTimer);
+  pollingActive = false;
+  pollErrors = 0;
+  pollUpdates();
 }
 
 // --- DB (GitHub-backed) ---
@@ -664,6 +672,12 @@ app.get('/api/stats/:uid', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
+
+app.get('/health', (req, res) => res.json({ ok: true, uptime: process.uptime() }));
+
+process.on('uncaughtException', (e) => { console.error('Uncaught:', e.message); restartPolling(); });
+process.on('unhandledRejection', (e) => { console.error('Unhandled:', e); });
+
 (async () => {
   await initDB();
   app.listen(PORT, '0.0.0.0', () => {
@@ -678,6 +692,12 @@ const PORT = process.env.PORT || 5000;
         console.error('deleteWebhook error:', e.message);
         pollUpdates();
       });
+
+    // Self-ping to prevent Render free tier from sleeping
+    const SELF_URL = process.env.RENDER_EXTERNAL_URL || WEBAPP_URL;
+    setInterval(() => {
+      fetch(SELF_URL).then(() => console.log('Self-ping OK')).catch(() => {});
+    }, 4 * 60 * 1000);
   });
 })();
 
