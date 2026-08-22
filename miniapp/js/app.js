@@ -70,8 +70,10 @@ async function loadCases() {
     const imgSrc = `/img/cases/${c.id}.png`;
     return `
     <div class="case-card" onclick="openCase('${c.id}')">
-      <div class="case-img-wrap"><img src="${imgSrc}" class="case-img" onerror="this.style.display='none';this.parentElement.parentElement.querySelector('.case-fallback').style.display='flex'"></div>
-      <div class="case-fallback" style="display:none"><span>${c.icon}</span></div>
+      <div class="case-img-wrap">
+        <img src="${imgSrc}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="case-fallback" style="display:none"><span>${c.icon}</span></div>
+      </div>
       <div class="case-bottom">
         <div class="case-name">${c.name}</div>
         <div class="case-price">★ ${c.price}</div>
