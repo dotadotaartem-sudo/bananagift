@@ -69,7 +69,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif
 .case-open-price{font-size:12px;color:var(--accent);font-weight:600;margin-top:2px}
 
 /* SPINNER */
-.spinner-container{position:relative;border-radius:12px;overflow:hidden;background:var(--bg3);margin-bottom:16px;height:110px}
+.spinner-container{position:relative;border-radius:12px;overflow:hidden;background:var(--bg3);margin-bottom:16px;height:130px}
 .spinner-container::before,.spinner-container::after{content:'';position:absolute;top:0;bottom:0;width:50px;z-index:3;pointer-events:none}
 .spinner-container::before{left:0;background:linear-gradient(90deg,var(--bg3),transparent)}
 .spinner-container::after{right:0;background:linear-gradient(270deg,var(--bg3),transparent)}
@@ -77,16 +77,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif
 .spinner-line::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--accent)}
 .spinner-line::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:8px solid var(--accent)}
 .spinner-track{display:flex;gap:6px;padding:10px 0;transition:transform 3.5s cubic-bezier(.15,.8,.2,1)}
-.spin-item{min-width:85px;height:90px;border-radius:10px;background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid rgba(56,189,248,.08)}
-.spin-item .si-img{width:36px;height:36px;overflow:hidden}
-.spin-item .spin-img{width:36px;height:36px;object-fit:contain}
+.spin-item{min-width:100px;height:110px;border-radius:12px;background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid rgba(56,189,248,.08);box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.spin-item .si-img{width:48px;height:48px;overflow:hidden}
+.spin-item .spin-img{width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(56,189,248,.3))}
 .spin-item .si-name{font-size:8px;color:var(--text2);margin-top:4px;text-align:center;max-width:75px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .spin-item .si-val{font-size:10px;font-weight:700;color:var(--accent)}
 
 /* RESULT */
 .result-card{text-align:center;padding:20px;background:var(--bg2);border-radius:var(--radius);margin-bottom:14px;border:1px solid rgba(56,189,248,.08);box-shadow:0 4px 16px rgba(0,0,0,.15)}
-.result-img{width:64px;height:64px;margin:0 auto;overflow:hidden}
-.result-gift-img{width:64px;height:64px;object-fit:contain;border-radius:10px}
+.result-img{width:96px;height:96px;margin:0 auto;overflow:hidden;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));padding:3px}
+.result-gift-img{width:90px;height:90px;object-fit:contain;border-radius:50%;background:var(--bg3)}
 .result-name{font-size:16px;font-weight:800;margin-top:8px}
 .result-meta{font-size:12px;color:var(--text2);margin-top:4px}
 .result-profit{font-size:13px;font-weight:700;margin-top:6px}
@@ -97,8 +97,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif
 .items-title{font-size:14px;font-weight:700;margin-bottom:10px;color:var(--text2)}
 .items-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .item-card{background:var(--bg2);border-radius:10px;padding:10px 6px;text-align:center;border:1px solid rgba(56,189,248,.06)}
-.item-card .ic-img{width:36px;height:36px;margin:0 auto;overflow:hidden}
-.item-card .gift-img{width:36px;height:36px;object-fit:contain}
+.item-card .ic-img{width:48px;height:48px;margin:0 auto;overflow:hidden;border-radius:10px;background:var(--bg3);padding:2px}
+.item-card .gift-img{width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(56,189,248,.2))}
 .item-card .ic-name{font-size:9px;color:var(--text2);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .item-card .ic-val{font-size:10px;font-weight:700;color:var(--accent);margin-top:2px}
 
@@ -144,8 +144,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif
 
 /* INVENTORY */
 .inv-item{background:var(--bg2);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;border:1px solid rgba(56,189,248,.06);margin-bottom:6px}
-.inv-img{width:36px;height:36px;flex-shrink:0;overflow:hidden}
-.inv-gift-img{width:36px;height:36px;object-fit:contain;border-radius:6px}
+.inv-img{width:48px;height:48px;flex-shrink:0;overflow:hidden;border-radius:10px;background:var(--bg3);padding:2px}
+.inv-gift-img{width:44px;height:44px;object-fit:contain;border-radius:8px;filter:drop-shadow(0 1px 4px rgba(56,189,248,.2))}
 .inv-info{flex:1}
 .inv-name{font-size:12px;font-weight:600}
 .inv-from{font-size:10px;color:var(--text2)}
