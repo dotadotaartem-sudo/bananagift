@@ -1,7 +1,7 @@
 {
   "users": {
     "8989575087": {
-      "stars": 835,
+      "stars": 785,
       "inventory": [
         {
           "name": "Heart",
@@ -56,6 +56,15 @@
           "rarity": "common",
           "from_case": "Star Case",
           "time": "2026-08-21T16:49:45.582Z"
+        },
+        {
+          "name": "Swiss Watch",
+          "emoji": "тМЪ",
+          "img": "/img/gifts/watch.webp",
+          "value": 15,
+          "rarity": "common",
+          "from_case": "Fresh Case",
+          "time": "2026-08-22T12:21:06.147Z"
         }
       ],
       "history": [
@@ -100,10 +109,17 @@
           "value": 1,
           "profit": 0,
           "time": "2026-08-21T16:49:45.582Z"
+        },
+        {
+          "case": "Fresh Case",
+          "item": "Swiss Watch",
+          "value": 15,
+          "profit": -35,
+          "time": "2026-08-22T12:21:06.147Z"
         }
       ],
-      "total_opened": 6,
-      "total_spent": 165,
+      "total_opened": 7,
+      "total_spent": 215,
       "joined": "2026-08-21T08:28:36.813Z"
     },
     "6312812921": {
