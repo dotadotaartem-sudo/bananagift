@@ -161,7 +161,7 @@ async function doOpen() {
     </div>
   `).join('');
 
-  const itemW = 91;
+  const itemW = 106;
   const offset = -(realIdx * itemW) + (wrap.offsetWidth / 2) - (itemW / 2);
   track.style.transition = 'transform 3.5s cubic-bezier(.15,.8,.2,1)';
   track.style.transform = `translateX(${offset}px)`;
