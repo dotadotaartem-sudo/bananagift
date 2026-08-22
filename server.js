@@ -1,6 +1,27 @@
+﻿require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 
-];
-];
+const BOT_TOKEN = process.env.BOT_TOKEN || '8824358281:AAF4sreKNCZugVvXjcdBZR-Y-gq02r4Xrpc';
+const WEBAPP_URL = (process.env.WEBAPP_URL || 'https://bananagift.onrender.com').replace(/\/+$/, '');
+const BOT_API = `https://api.telegram.org/bot${BOT_TOKEN}`;
+
+const TRC20_WALLET = process.env.TRC20_WALLET || 'TEXYPDDagRz4z7gbYZhn9n2P3Er3nqmHBB';
+const USDT_TRC20 = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
+const TRONGRID_API = 'https://api.trongrid.io/v1';
+
+async function tg(method, body) {
+  const r = await fetch(`${BOT_API}/${method}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return r.json();
+}
+
+const OWNER_IDS = ['8989575087'];
 
 async function handleUpdate(update) {
   if (!update.message) return;
@@ -20,14 +41,14 @@ async function handleUpdate(update) {
         text: `Привет, ${firstName}!\n\nДобро пожаловать в BananGift!\nОткрывай кейсы, прокачивай предметы и выигрывай редкие подарки!`,
         reply_markup: {
           inline_keyboard: [
-            [{ text: '🎁 Открыть бот', web_app: { url: miniAppUrl } }]
+            [{ text: 'ЁЯОБ Открыть бот', web_app: { url: miniAppUrl } }]
           ]
         }
       });
     } else if (cmd === '/help') {
       await tg('sendMessage', {
         chat_id: chatId,
-        text: 'Команды:\n/start — Открыть бота\n/myid — Твой ID\n\nИспользуй мини-апп для кейсов, магазина и многого другого!'
+        text: 'Команды:\n/start тАФ Открыть бота\n/myid тАФ Твой ID\n\nИспользуй мини-апп для кейсов, магазина и многого другого!'
       });
     } else if (cmd === '/addstars' && OWNER_IDS.includes(fromId)) {
       const parts = text.split(' ');
@@ -37,12 +58,12 @@ async function handleUpdate(update) {
       updateUser(chatId, user);
       await tg('sendMessage', {
         chat_id: chatId,
-        text: `✅ +${amount}★ added! Balance: ${user.stars}★`
+        text: `тЬЕ +${amount}тШЕ добавлено! Баланс: ${user.stars}тШЕ`
       });
     } else if (cmd === '/myid') {
       await tg('sendMessage', {
         chat_id: chatId,
-        text: `Your ID: ${fromId}\nChat ID: ${chatId}`
+        text: `ID: ${fromId}\nЧат ID: ${chatId}`
       });
     }
   } catch (e) {
@@ -199,12 +220,12 @@ function updateUser(uid, data) {
 
 // --- EMOJI TO IMG MAP ---
 const EMOJI_IMG = {
-  '❤️': 'heart', '🧸': 'bear', '🌹': 'rose', '🎁': 'gift', '🍀': 'clover',
-  '🔥': 'fire', '💐': 'bouquet', '🌸': 'sakura', '🍪': 'cookie', '🌊': 'wave',
-  '🚀': 'rocket', '🎄': 'tree', '🎆': 'fireworks', '🎸': 'guitar', '🏆': 'trophy',
-  '💍': 'ring', '💎': 'diamond', '🌌': 'galaxy', '🏔️': 'mountain', '🎂': 'cake',
-  '🐰': 'bunny', '🐕': 'dog', '⌚': 'watch', '⛑️': 'helmet', '🍑': 'peach',
-  '🎒': 'bag', '🔮': 'crystal', '💝': 'heart_locket', '😺': 'cat', '🐸': 'pepe',
+  'тЭдя╕П': 'heart', 'ЁЯз╕': 'bear', 'ЁЯМ╣': 'rose', 'ЁЯОБ': 'gift', 'ЁЯНА': 'clover',
+  'ЁЯФе': 'fire', 'ЁЯТР': 'bouquet', 'ЁЯМ╕': 'sakura', 'ЁЯНк': 'cookie', 'ЁЯМК': 'wave',
+  'ЁЯЪА': 'rocket', 'ЁЯОД': 'tree', 'ЁЯОЖ': 'fireworks', 'ЁЯО╕': 'guitar', 'ЁЯПЖ': 'trophy',
+  'ЁЯТН': 'ring', 'ЁЯТО': 'diamond', 'ЁЯММ': 'galaxy', 'ЁЯПФя╕П': 'mountain', 'ЁЯОВ': 'cake',
+  'ЁЯР░': 'bunny', 'ЁЯРХ': 'dog', 'тМЪ': 'watch', 'тЫСя╕П': 'helmet', 'ЁЯНС': 'peach',
+  'ЁЯОТ': 'bag', 'ЁЯФо': 'crystal', 'ЁЯТЭ': 'heart_locket', 'ЁЯШ║': 'cat', 'ЁЯР╕': 'pepe',
 };
 
 const GIFTS_DIR = path.join(__dirname, 'miniapp', 'img', 'gifts');
@@ -231,146 +252,146 @@ function giftImg(emoji, name) {
 // --- CASES ---
 const CASES = [
   {
-    id: 'star', name: 'Star Case', icon: '⭐', img: '/img/cases/star.png', price: 1, color: '#eab308',
+    id: 'star', name: 'Star Case', icon: 'тнР', img: '/img/cases/star.png', price: 1, color: '#eab308',
     items: [
-      { name: 'Heart', emoji: '❤️', value: 1, rarity: 'common', chance: 60 },
-      { name: 'Teddy Bear', emoji: '🧸', value: 1, rarity: 'common', chance: 25 },
-      { name: 'Rose', emoji: '🌹', value: 1, rarity: 'common', chance: 10 },
-      { name: 'Gift Box', emoji: '🎁', value: 1, rarity: 'uncommon', chance: 3 },
-      { name: 'Clover', emoji: '🍀', value: 2, rarity: 'uncommon', chance: 1.5 },
-      { name: 'Bouquet', emoji: '💐', value: 2, rarity: 'rare', chance: 0.4 },
-      { name: 'Sakura', emoji: '🌸', value: 3, rarity: 'epic', chance: 0.08 },
-      { name: 'Jelly Bunny', emoji: '🐰', value: 5, rarity: 'epic', chance: 0.02 },
+      { name: 'Heart', emoji: 'тЭдя╕П', value: 1, rarity: 'common', chance: 60 },
+      { name: 'Teddy Bear', emoji: 'ЁЯз╕', value: 1, rarity: 'common', chance: 25 },
+      { name: 'Rose', emoji: 'ЁЯМ╣', value: 1, rarity: 'common', chance: 10 },
+      { name: 'Gift Box', emoji: 'ЁЯОБ', value: 1, rarity: 'uncommon', chance: 3 },
+      { name: 'Clover', emoji: 'ЁЯНА', value: 2, rarity: 'uncommon', chance: 1.5 },
+      { name: 'Bouquet', emoji: 'ЁЯТР', value: 2, rarity: 'rare', chance: 0.4 },
+      { name: 'Sakura', emoji: 'ЁЯМ╕', value: 3, rarity: 'epic', chance: 0.08 },
+      { name: 'Jelly Bunny', emoji: 'ЁЯР░', value: 5, rarity: 'epic', chance: 0.02 },
     ]
   },
   {
-    id: 'summer', name: 'Super Summer Capsule', icon: '☀️', img: '/img/cases/summer.png', price: 5, color: '#f97316',
+    id: 'summer', name: 'Super Summer Capsule', icon: 'тШАя╕П', img: '/img/cases/summer.png', price: 5, color: '#f97316',
     items: [
-      { name: 'Heart', emoji: '❤️', value: 1, rarity: 'common', chance: 35 },
-      { name: 'Teddy Bear', emoji: '🧸', value: 1, rarity: 'common', chance: 25 },
-      { name: 'Rose', emoji: '🌹', value: 1, rarity: 'common', chance: 18 },
-      { name: 'Gift Box', emoji: '🎁', value: 2, rarity: 'common', chance: 10 },
-      { name: 'Clover', emoji: '🍀', value: 2, rarity: 'uncommon', chance: 5 },
-      { name: 'Flame', emoji: '🔥', value: 2, rarity: 'uncommon', chance: 3.5 },
-      { name: 'Sakura', emoji: '🌸', value: 3, rarity: 'rare', chance: 1.8 },
-      { name: 'Snoop Dogg', emoji: '🐕', value: 3, rarity: 'rare', chance: 1 },
-      { name: 'Eternal Rose', emoji: '🌹', value: 5, rarity: 'epic', chance: 0.5 },
-      { name: 'Toy Bear', emoji: '🧸', value: 8, rarity: 'epic', chance: 0.15 },
-      { name: 'Swiss Watch', emoji: '⌚', value: 15, rarity: 'legendary', chance: 0.05 },
+      { name: 'Heart', emoji: 'тЭдя╕П', value: 1, rarity: 'common', chance: 35 },
+      { name: 'Teddy Bear', emoji: 'ЁЯз╕', value: 1, rarity: 'common', chance: 25 },
+      { name: 'Rose', emoji: 'ЁЯМ╣', value: 1, rarity: 'common', chance: 18 },
+      { name: 'Gift Box', emoji: 'ЁЯОБ', value: 2, rarity: 'common', chance: 10 },
+      { name: 'Clover', emoji: 'ЁЯНА', value: 2, rarity: 'uncommon', chance: 5 },
+      { name: 'Flame', emoji: 'ЁЯФе', value: 2, rarity: 'uncommon', chance: 3.5 },
+      { name: 'Sakura', emoji: 'ЁЯМ╕', value: 3, rarity: 'rare', chance: 1.8 },
+      { name: 'Snoop Dogg', emoji: 'ЁЯРХ', value: 3, rarity: 'rare', chance: 1 },
+      { name: 'Eternal Rose', emoji: 'ЁЯМ╣', value: 5, rarity: 'epic', chance: 0.5 },
+      { name: 'Toy Bear', emoji: 'ЁЯз╕', value: 8, rarity: 'epic', chance: 0.15 },
+      { name: 'Swiss Watch', emoji: 'тМЪ', value: 15, rarity: 'legendary', chance: 0.05 },
     ]
   },
   {
-    id: 'rgb', name: 'RGB Capsule Case', icon: '🌈', img: '/img/cases/rgb.png', price: 8, color: '#8b5cf6',
+    id: 'rgb', name: 'RGB Capsule Case', icon: 'ЁЯМИ', img: '/img/cases/rgb.png', price: 8, color: '#8b5cf6',
     items: [
-      { name: 'Heart', emoji: '❤️', value: 1, rarity: 'common', chance: 30 },
-      { name: 'Teddy Bear', emoji: '🧸', value: 1, rarity: 'common', chance: 22 },
-      { name: 'Clover', emoji: '🍀', value: 2, rarity: 'common', chance: 15 },
-      { name: 'Flame', emoji: '🔥', value: 2, rarity: 'common', chance: 12 },
-      { name: 'Sakura', emoji: '🌸', value: 3, rarity: 'uncommon', chance: 8 },
-      { name: 'Cookie', emoji: '🍪', value: 2, rarity: 'uncommon', chance: 5 },
-      { name: 'Eternal Rose', emoji: '🌹', value: 5, rarity: 'rare', chance: 3.5 },
-      { name: 'Toy Bear', emoji: '🧸', value: 8, rarity: 'rare', chance: 2.5 },
-      { name: 'Swiss Watch', emoji: '⌚', value: 15, rarity: 'epic', chance: 1.2 },
-      { name: 'Heroic Helmet', emoji: '⛑️', value: 30, rarity: 'epic', chance: 0.5 },
-      { name: 'Durov\'s Cap', emoji: '🧢', value: 50, rarity: 'legendary', chance: 0.15 },
-      { name: 'Plush Pepe', emoji: '🐸', value: 100, rarity: 'legendary', chance: 0.05 },
+      { name: 'Heart', emoji: 'тЭдя╕П', value: 1, rarity: 'common', chance: 30 },
+      { name: 'Teddy Bear', emoji: 'ЁЯз╕', value: 1, rarity: 'common', chance: 22 },
+      { name: 'Clover', emoji: 'ЁЯНА', value: 2, rarity: 'common', chance: 15 },
+      { name: 'Flame', emoji: 'ЁЯФе', value: 2, rarity: 'common', chance: 12 },
+      { name: 'Sakura', emoji: 'ЁЯМ╕', value: 3, rarity: 'uncommon', chance: 8 },
+      { name: 'Cookie', emoji: 'ЁЯНк', value: 2, rarity: 'uncommon', chance: 5 },
+      { name: 'Eternal Rose', emoji: 'ЁЯМ╣', value: 5, rarity: 'rare', chance: 3.5 },
+      { name: 'Toy Bear', emoji: 'ЁЯз╕', value: 8, rarity: 'rare', chance: 2.5 },
+      { name: 'Swiss Watch', emoji: 'тМЪ', value: 15, rarity: 'epic', chance: 1.2 },
+      { name: 'Heroic Helmet', emoji: 'тЫСя╕П', value: 30, rarity: 'epic', chance: 0.5 },
+      { name: 'Durov\'s Cap', emoji: 'ЁЯзв', value: 50, rarity: 'legendary', chance: 0.15 },
+      { name: 'Plush Pepe', emoji: 'ЁЯР╕', value: 100, rarity: 'legendary', chance: 0.05 },
     ]
   },
   {
-    id: 'regular', name: 'Regular Case', icon: '📦', img: '/img/cases/regular.png', price: 12, color: '#6366f1',
+    id: 'regular', name: 'Regular Case', icon: 'ЁЯУж', img: '/img/cases/regular.png', price: 12, color: '#6366f1',
     items: [
-      { name: 'Heart', emoji: '❤️', value: 1, rarity: 'common', chance: 22 },
-      { name: 'Teddy Bear', emoji: '🧸', value: 1, rarity: 'common', chance: 18 },
-      { name: 'Sakura', emoji: '🌸', value: 3, rarity: 'common', chance: 15 },
-      { name: 'Cookie', emoji: '🍪', value: 2, rarity: 'common', chance: 12 },
-      { name: 'Eternal Rose', emoji: '🌹', value: 5, rarity: 'uncommon', chance: 10 },
-      { name: 'Snoop Dogg', emoji: '🐕', value: 3, rarity: 'uncommon', chance: 8 },
-      { name: 'Jelly Bunny', emoji: '🐰', value: 5, rarity: 'uncommon', chance: 5 },
-      { name: 'Toy Bear', emoji: '🧸', value: 8, rarity: 'rare', chance: 4 },
-      { name: 'Swiss Watch', emoji: '⌚', value: 15, rarity: 'rare', chance: 2.5 },
-      { name: 'Astral Shard', emoji: '🔮', value: 20, rarity: 'epic', chance: 1.5 },
-      { name: 'Loot Bag', emoji: '🎒', value: 25, rarity: 'epic', chance: 0.8 },
-      { name: 'Precious Peach', emoji: '🍑', value: 50, rarity: 'legendary', chance: 0.15 },
-      { name: 'Plush Pepe', emoji: '🐸', value: 150, rarity: 'legendary', chance: 0.05 },
+      { name: 'Heart', emoji: 'тЭдя╕П', value: 1, rarity: 'common', chance: 22 },
+      { name: 'Teddy Bear', emoji: 'ЁЯз╕', value: 1, rarity: 'common', chance: 18 },
+      { name: 'Sakura', emoji: 'ЁЯМ╕', value: 3, rarity: 'common', chance: 15 },
+      { name: 'Cookie', emoji: 'ЁЯНк', value: 2, rarity: 'common', chance: 12 },
+      { name: 'Eternal Rose', emoji: 'ЁЯМ╣', value: 5, rarity: 'uncommon', chance: 10 },
+      { name: 'Snoop Dogg', emoji: 'ЁЯРХ', value: 3, rarity: 'uncommon', chance: 8 },
+      { name: 'Jelly Bunny', emoji: 'ЁЯР░', value: 5, rarity: 'uncommon', chance: 5 },
+      { name: 'Toy Bear', emoji: 'ЁЯз╕', value: 8, rarity: 'rare', chance: 4 },
+      { name: 'Swiss Watch', emoji: 'тМЪ', value: 15, rarity: 'rare', chance: 2.5 },
+      { name: 'Astral Shard', emoji: 'ЁЯФо', value: 20, rarity: 'epic', chance: 1.5 },
+      { name: 'Loot Bag', emoji: 'ЁЯОТ', value: 25, rarity: 'epic', chance: 0.8 },
+      { name: 'Precious Peach', emoji: 'ЁЯНС', value: 50, rarity: 'legendary', chance: 0.15 },
+      { name: 'Plush Pepe', emoji: 'ЁЯР╕', value: 150, rarity: 'legendary', chance: 0.05 },
     ]
   },
   {
-    id: 'farm', name: 'Farm Case', icon: '🌾', img: '/img/cases/farm.png', price: 15, color: '#22c55e',
+    id: 'farm', name: 'Farm Case', icon: 'ЁЯМ╛', img: '/img/cases/farm.png', price: 15, color: '#22c55e',
     items: [
-      { name: 'Heart', emoji: '❤️', value: 1, rarity: 'common', chance: 20 },
-      { name: 'Snoop Dogg', emoji: '🐕', value: 3, rarity: 'common', chance: 18 },
-      { name: 'Jelly Bunny', emoji: '🐰', value: 5, rarity: 'common', chance: 15 },
-      { name: 'Eternal Rose', emoji: '🌹', value: 5, rarity: 'common', chance: 12 },
-      { name: 'Toy Bear', emoji: '🧸', value: 8, rarity: 'uncommon', chance: 10 },
-      { name: 'Swiss Watch', emoji: '⌚', value: 15, rarity: 'uncommon', chance: 8 },
-      { name: 'Astral Shard', emoji: '🔮', value: 20, rarity: 'rare', chance: 5 },
-      { name: 'Loot Bag', emoji: '🎒', value: 25, rarity: 'rare', chance: 4 },
-      { name: 'Heroic Helmet', emoji: '⛑️', value: 30, rarity: 'epic', chance: 3 },
-      { name: 'Scared Cat', emoji: '😺', value: 40, rarity: 'epic', chance: 2 },
-      { name: 'Precious Peach', emoji: '🍑', value: 50, rarity: 'legendary', chance: 1.5 },
-      { name: 'Durov\'s Cap', emoji: '🧢', value: 80, rarity: 'legendary', chance: 0.8 },
-      { name: 'Plush Pepe', emoji: '🐸', value: 200, rarity: 'legendary', chance: 0.15 },
-      { name: 'Heart Locket', emoji: '💝', value: 300, rarity: 'legendary', chance: 0.05 },
+      { name: 'Heart', emoji: 'тЭдя╕П', value: 1, rarity: 'common', chance: 20 },
+      { name: 'Snoop Dogg', emoji: 'ЁЯРХ', value: 3, rarity: 'common', chance: 18 },
+      { name: 'Jelly Bunny', emoji: 'ЁЯР░', value: 5, rarity: 'common', chance: 15 },
+      { name: 'Eternal Rose', emoji: 'ЁЯМ╣', value: 5, rarity: 'common', chance: 12 },
+      { name: 'Toy Bear', emoji: 'ЁЯз╕', value: 8, rarity: 'uncommon', chance: 10 },
+      { name: 'Swiss Watch', emoji: 'тМЪ', value: 15, rarity: 'uncommon', chance: 8 },
+      { name: 'Astral Shard', emoji: 'ЁЯФо', value: 20, rarity: 'rare', chance: 5 },
+      { name: 'Loot Bag', emoji: 'ЁЯОТ', value: 25, rarity: 'rare', chance: 4 },
+      { name: 'Heroic Helmet', emoji: 'тЫСя╕П', value: 30, rarity: 'epic', chance: 3 },
+      { name: 'Scared Cat', emoji: 'ЁЯШ║', value: 40, rarity: 'epic', chance: 2 },
+      { name: 'Precious Peach', emoji: 'ЁЯНС', value: 50, rarity: 'legendary', chance: 1.5 },
+      { name: 'Durov\'s Cap', emoji: 'ЁЯзв', value: 80, rarity: 'legendary', chance: 0.8 },
+      { name: 'Plush Pepe', emoji: 'ЁЯР╕', value: 200, rarity: 'legendary', chance: 0.15 },
+      { name: 'Heart Locket', emoji: 'ЁЯТЭ', value: 300, rarity: 'legendary', chance: 0.05 },
     ]
   },
   {
-    id: 'flex', name: 'Flex Case', icon: '😎', img: '/img/cases/flex.png', price: 25, color: '#ec4899',
+    id: 'flex', name: 'Flex Case', icon: 'ЁЯШО', img: '/img/cases/flex.png', price: 25, color: '#ec4899',
     items: [
-      { name: 'Heart', emoji: '❤️', value: 1, rarity: 'common', chance: 15 },
-      { name: 'Teddy Bear', emoji: '🧸', value: 1, rarity: 'common', chance: 14 },
-      { name: 'Toy Bear', emoji: '🧸', value: 8, rarity: 'common', chance: 12 },
-      { name: 'Swiss Watch', emoji: '⌚', value: 15, rarity: 'common', chance: 10 },
-      { name: 'Astral Shard', emoji: '🔮', value: 20, rarity: 'uncommon', chance: 10 },
-      { name: 'Loot Bag', emoji: '🎒', value: 25, rarity: 'uncommon', chance: 8 },
-      { name: 'Heroic Helmet', emoji: '⛑️', value: 30, rarity: 'rare', chance: 7 },
-      { name: 'Scared Cat', emoji: '😺', value: 40, rarity: 'rare', chance: 6 },
-      { name: 'Precious Peach', emoji: '🍑', value: 50, rarity: 'rare', chance: 5 },
-      { name: 'Durov\'s Cap', emoji: '🧢', value: 80, rarity: 'epic', chance: 4 },
-      { name: 'Heart Locket', emoji: '💝', value: 120, rarity: 'epic', chance: 3 },
-      { name: 'Plush Pepe', emoji: '🐸', value: 300, rarity: 'legendary', chance: 2 },
-      { name: 'Heart Locket', emoji: '💝', value: 500, rarity: 'legendary', chance: 0.8 },
-      { name: 'Plush Pepe', emoji: '🐸', value: 800, rarity: 'legendary', chance: 0.2 },
+      { name: 'Heart', emoji: 'тЭдя╕П', value: 1, rarity: 'common', chance: 15 },
+      { name: 'Teddy Bear', emoji: 'ЁЯз╕', value: 1, rarity: 'common', chance: 14 },
+      { name: 'Toy Bear', emoji: 'ЁЯз╕', value: 8, rarity: 'common', chance: 12 },
+      { name: 'Swiss Watch', emoji: 'тМЪ', value: 15, rarity: 'common', chance: 10 },
+      { name: 'Astral Shard', emoji: 'ЁЯФо', value: 20, rarity: 'uncommon', chance: 10 },
+      { name: 'Loot Bag', emoji: 'ЁЯОТ', value: 25, rarity: 'uncommon', chance: 8 },
+      { name: 'Heroic Helmet', emoji: 'тЫСя╕П', value: 30, rarity: 'rare', chance: 7 },
+      { name: 'Scared Cat', emoji: 'ЁЯШ║', value: 40, rarity: 'rare', chance: 6 },
+      { name: 'Precious Peach', emoji: 'ЁЯНС', value: 50, rarity: 'rare', chance: 5 },
+      { name: 'Durov\'s Cap', emoji: 'ЁЯзв', value: 80, rarity: 'epic', chance: 4 },
+      { name: 'Heart Locket', emoji: 'ЁЯТЭ', value: 120, rarity: 'epic', chance: 3 },
+      { name: 'Plush Pepe', emoji: 'ЁЯР╕', value: 300, rarity: 'legendary', chance: 2 },
+      { name: 'Heart Locket', emoji: 'ЁЯТЭ', value: 500, rarity: 'legendary', chance: 0.8 },
+      { name: 'Plush Pepe', emoji: 'ЁЯР╕', value: 800, rarity: 'legendary', chance: 0.2 },
     ]
   },
   {
-    id: 'vision', name: 'Vision Case', icon: '🔮', img: '/img/cases/vision.png', price: 35, color: '#06b6d4',
+    id: 'vision', name: 'Vision Case', icon: 'ЁЯФо', img: '/img/cases/vision.png', price: 35, color: '#06b6d4',
     items: [
-      { name: 'Heart', emoji: '❤️', value: 1, rarity: 'common', chance: 14 },
-      { name: 'Sakura', emoji: '🌸', value: 3, rarity: 'common', chance: 12 },
-      { name: 'Snoop Dogg', emoji: '🐕', value: 3, rarity: 'common', chance: 10 },
-      { name: 'Astral Shard', emoji: '🔮', value: 20, rarity: 'common', chance: 10 },
-      { name: 'Loot Bag', emoji: '🎒', value: 25, rarity: 'common', chance: 9 },
-      { name: 'Heroic Helmet', emoji: '⛑️', value: 30, rarity: 'uncommon', chance: 8 },
-      { name: 'Scared Cat', emoji: '😺', value: 40, rarity: 'uncommon', chance: 7 },
-      { name: 'Precious Peach', emoji: '🍑', value: 50, rarity: 'rare', chance: 6 },
-      { name: 'Durov\'s Cap', emoji: '🧢', value: 80, rarity: 'rare', chance: 5 },
-      { name: 'Heart Locket', emoji: '💝', value: 120, rarity: 'rare', chance: 5 },
-      { name: 'Plush Pepe', emoji: '🐸', value: 300, rarity: 'epic', chance: 4 },
-      { name: 'Heart Locket', emoji: '💝', value: 500, rarity: 'epic', chance: 3 },
-      { name: 'Plush Pepe', emoji: '🐸', value: 500, rarity: 'legendary', chance: 2 },
-      { name: 'Heart Locket', emoji: '💝', value: 800, rarity: 'legendary', chance: 1 },
-      { name: 'Plush Pepe', emoji: '🐸', value: 1500, rarity: 'legendary', chance: 0.2 },
+      { name: 'Heart', emoji: 'тЭдя╕П', value: 1, rarity: 'common', chance: 14 },
+      { name: 'Sakura', emoji: 'ЁЯМ╕', value: 3, rarity: 'common', chance: 12 },
+      { name: 'Snoop Dogg', emoji: 'ЁЯРХ', value: 3, rarity: 'common', chance: 10 },
+      { name: 'Astral Shard', emoji: 'ЁЯФо', value: 20, rarity: 'common', chance: 10 },
+      { name: 'Loot Bag', emoji: 'ЁЯОТ', value: 25, rarity: 'common', chance: 9 },
+      { name: 'Heroic Helmet', emoji: 'тЫСя╕П', value: 30, rarity: 'uncommon', chance: 8 },
+      { name: 'Scared Cat', emoji: 'ЁЯШ║', value: 40, rarity: 'uncommon', chance: 7 },
+      { name: 'Precious Peach', emoji: 'ЁЯНС', value: 50, rarity: 'rare', chance: 6 },
+      { name: 'Durov\'s Cap', emoji: 'ЁЯзв', value: 80, rarity: 'rare', chance: 5 },
+      { name: 'Heart Locket', emoji: 'ЁЯТЭ', value: 120, rarity: 'rare', chance: 5 },
+      { name: 'Plush Pepe', emoji: 'ЁЯР╕', value: 300, rarity: 'epic', chance: 4 },
+      { name: 'Heart Locket', emoji: 'ЁЯТЭ', value: 500, rarity: 'epic', chance: 3 },
+      { name: 'Plush Pepe', emoji: 'ЁЯР╕', value: 500, rarity: 'legendary', chance: 2 },
+      { name: 'Heart Locket', emoji: 'ЁЯТЭ', value: 800, rarity: 'legendary', chance: 1 },
+      { name: 'Plush Pepe', emoji: 'ЁЯР╕', value: 1500, rarity: 'legendary', chance: 0.2 },
     ]
   },
   {
-    id: 'fresh', name: 'Fresh Case', icon: '🍃', img: '/img/cases/fresh.png', price: 50, color: '#10b981',
+    id: 'fresh', name: 'Fresh Case', icon: 'ЁЯНГ', img: '/img/cases/fresh.png', price: 50, color: '#10b981',
     items: [
-      { name: 'Heart', emoji: '❤️', value: 1, rarity: 'common', chance: 12 },
-      { name: 'Teddy Bear', emoji: '🧸', value: 1, rarity: 'common', chance: 11 },
-      { name: 'Rose', emoji: '🌹', value: 1, rarity: 'common', chance: 10 },
-      { name: 'Sakura', emoji: '🌸', value: 3, rarity: 'common', chance: 9 },
-      { name: 'Swiss Watch', emoji: '⌚', value: 15, rarity: 'common', chance: 8 },
-      { name: 'Heroic Helmet', emoji: '⛑️', value: 30, rarity: 'uncommon', chance: 7 },
-      { name: 'Scared Cat', emoji: '😺', value: 40, rarity: 'uncommon', chance: 7 },
-      { name: 'Precious Peach', emoji: '🍑', value: 50, rarity: 'uncommon', chance: 6 },
-      { name: 'Durov\'s Cap', emoji: '🧢', value: 80, rarity: 'rare', chance: 6 },
-      { name: 'Heart Locket', emoji: '💝', value: 120, rarity: 'rare', chance: 5 },
-      { name: 'Plush Pepe', emoji: '🐸', value: 300, rarity: 'rare', chance: 5 },
-      { name: 'Heart Locket', emoji: '💝', value: 500, rarity: 'epic', chance: 4 },
-      { name: 'Plush Pepe', emoji: '🐸', value: 500, rarity: 'epic', chance: 3 },
-      { name: 'Heart Locket', emoji: '💝', value: 800, rarity: 'legendary', chance: 2 },
-      { name: 'Plush Pepe', emoji: '🐸', value: 1500, rarity: 'legendary', chance: 1 },
-      { name: 'Plush Pepe', emoji: '🐸', value: 3000, rarity: 'legendary', chance: 0.2 },
+      { name: 'Heart', emoji: 'тЭдя╕П', value: 1, rarity: 'common', chance: 12 },
+      { name: 'Teddy Bear', emoji: 'ЁЯз╕', value: 1, rarity: 'common', chance: 11 },
+      { name: 'Rose', emoji: 'ЁЯМ╣', value: 1, rarity: 'common', chance: 10 },
+      { name: 'Sakura', emoji: 'ЁЯМ╕', value: 3, rarity: 'common', chance: 9 },
+      { name: 'Swiss Watch', emoji: 'тМЪ', value: 15, rarity: 'common', chance: 8 },
+      { name: 'Heroic Helmet', emoji: 'тЫСя╕П', value: 30, rarity: 'uncommon', chance: 7 },
+      { name: 'Scared Cat', emoji: 'ЁЯШ║', value: 40, rarity: 'uncommon', chance: 7 },
+      { name: 'Precious Peach', emoji: 'ЁЯНС', value: 50, rarity: 'uncommon', chance: 6 },
+      { name: 'Durov\'s Cap', emoji: 'ЁЯзв', value: 80, rarity: 'rare', chance: 6 },
+      { name: 'Heart Locket', emoji: 'ЁЯТЭ', value: 120, rarity: 'rare', chance: 5 },
+      { name: 'Plush Pepe', emoji: 'ЁЯР╕', value: 300, rarity: 'rare', chance: 5 },
+      { name: 'Heart Locket', emoji: 'ЁЯТЭ', value: 500, rarity: 'epic', chance: 4 },
+      { name: 'Plush Pepe', emoji: 'ЁЯР╕', value: 500, rarity: 'epic', chance: 3 },
+      { name: 'Heart Locket', emoji: 'ЁЯТЭ', value: 800, rarity: 'legendary', chance: 2 },
+      { name: 'Plush Pepe', emoji: 'ЁЯР╕', value: 1500, rarity: 'legendary', chance: 1 },
+      { name: 'Plush Pepe', emoji: 'ЁЯР╕', value: 3000, rarity: 'legendary', chance: 0.2 },
     ]
   },
 ];
@@ -392,7 +413,7 @@ const STAR_PACKS = [
 ];
 
 const PAYMENT_METHODS = [
-  { id: 'trc20', name: 'USDT (TRC20)', icon: '₮', desc: 'Tron Network' },
+  { id: 'trc20', name: 'USDT (TRC20)', icon: 'тВо', desc: 'Tron Network' },
 ];
 
 function rollItem(items) {
@@ -490,7 +511,7 @@ app.post('/api/upgrade', (req, res) => {
 
   if (success) {
     const newItem = {
-      name: `NFT Upgrade ★${target}`, emoji: '⬆️',
+      name: `NFT Upgrade тШЕ${target}`, emoji: 'тмЖя╕П',
       value: target, rarity: target < 500 ? 'rare' : 'epic',
       from_case: 'Upgrade', time: new Date().toISOString(),
     };
