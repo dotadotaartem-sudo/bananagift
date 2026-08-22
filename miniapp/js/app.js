@@ -260,58 +260,90 @@ async function loadHistory() {
 
 // SHOP
 let currentOrderId = null;
+let selectedMethod = 'card';
 
 async function loadShop() {
-  const [packs, wallet] = await Promise.all([
-    api('/api/shop/packs'),
-    api('/api/shop/wallet'),
-  ]);
+  const packs = await api('/api/shop/packs');
 
   document.getElementById('packGrid').innerHTML = packs.map((p, i) => `
     <div class="pack-card${i === 2 ? ' best' : ''}" onclick="selectPack(${p.stars})">
       <div class="pack-stars">★ ${p.stars}</div>
-      <div class="pack-price">$${p.usd} USDT</div>
+      <div class="pack-price">${p.rub} ₽</div>
       ${p.bonus ? `<div class="pack-bonus">+${p.bonus}% бонус</div>` : ''}
-      <div class="pack-alt">≈ ₽${p.rub} · ≈ €${p.eur}</div>
+      <div class="pack-alt">≈ $${p.usd} · ≈ €${p.eur}</div>
     </div>
   `).join('');
 
   document.getElementById('payList').innerHTML = `
-    <div class="pay-card">
+    <div class="pay-card" onclick="pickMethod('card')" id="method-card" style="border-color:rgba(56,189,248,.4)">
+      <div class="pay-icon">💳</div>
+      <div><div class="pay-name">Банковская карта</div><div class="pay-desc">Рубли (RUB) · СБП / Перевод</div></div>
+    </div>
+    <div class="pay-card" onclick="pickMethod('trc20')" id="method-trc20">
       <div class="pay-icon">₮</div>
-      <div><div class="pay-name">USDT (TRC20)</div><div class="pay-desc">Tron Network · ${wallet.address.slice(0,8)}...${wallet.address.slice(-6)}</div></div>
+      <div><div class="pay-name">USDT (TRC20)</div><div class="pay-desc">Tron Network · Криптовалюта</div></div>
     </div>
   `;
 }
 
+function pickMethod(m) {
+  selectedMethod = m;
+  document.querySelectorAll('.pay-card').forEach(c => c.style.borderColor = 'rgba(56,189,248,.06)');
+  const el = document.getElementById('method-' + m);
+  if (el) el.style.borderColor = 'rgba(56,189,248,.4)';
+}
+
 async function selectPack(stars) {
-  const res = await api('/api/pay/create', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ uid, pack_stars: stars })
-  });
-  if (res.error) { toast(res.error); return; }
-
-  currentOrderId = res.order_id;
-  document.getElementById('modalTitle').textContent = `Купить ★ ${stars}`;
-  document.getElementById('modalPrice').textContent = `${res.amount_usdt} USDT`;
-
-  document.getElementById('modalMethods').innerHTML = `
-    <div class="pay-step">
-      <div class="pay-step-num">1</div>
-      <div class="pay-step-text">Отправьте ровно <strong>${res.amount_usdt} USDT</strong> на:</div>
-      <div class="pay-address" onclick="copyAddress('${res.wallet}')">${res.wallet}</div>
-      <div class="pay-step-hint">Нажмите на адрес чтобы скопировать · Сеть: только TRC20</div>
-    </div>
-    <div class="pay-step">
-      <div class="pay-step-num">2</div>
-      <div class="pay-step-text">Вставьте TX хеш:</div>
-      <input type="text" class="pay-input" id="txHashInput" placeholder="Введите хеш транзакции..." autocomplete="off">
-    </div>
-    <button class="btn btn-pink" onclick="verifyPayment()">Проверить оплату</button>
-    <div id="payStatus"></div>
-  `;
-
+  if (selectedMethod === 'card') {
+    const res = await api('/api/pay/card/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uid, pack_stars: stars })
+    });
+    if (res.error) { toast(res.error); return; }
+    currentOrderId = res.order_id;
+    document.getElementById('modalTitle').textContent = 'Купить ★ ' + stars;
+    document.getElementById('modalPrice').textContent = res.amount_rub + ' ₽';
+    document.getElementById('modalMethods').innerHTML = `
+      <div class="pay-step">
+        <div class="pay-step-num">1</div>
+        <div class="pay-step-text">Переведите ровно <strong>${res.amount_rub} ₽</strong> на карту:</div>
+        <div class="pay-address" onclick="copyAddress('${res.card}')">${res.card}</div>
+        <div class="pay-step-hint">Нажмите чтобы скопировать · Получатель: ${res.recipient}</div>
+      </div>
+      <div class="pay-step">
+        <div class="pay-step-num">2</div>
+        <div class="pay-step-text">Нажмите кнопку после перевода:</div>
+      </div>
+      <button class="btn btn-pink" onclick="confirmCardPayment()">Я оплатил</button>
+      <div id="payStatus"></div>
+    `;
+  } else {
+    const res = await api('/api/pay/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uid, pack_stars: stars })
+    });
+    if (res.error) { toast(res.error); return; }
+    currentOrderId = res.order_id;
+    document.getElementById('modalTitle').textContent = 'Купить ★ ' + stars;
+    document.getElementById('modalPrice').textContent = res.amount_usdt + ' USDT';
+    document.getElementById('modalMethods').innerHTML = `
+      <div class="pay-step">
+        <div class="pay-step-num">1</div>
+        <div class="pay-step-text">Отправьте ровно <strong>${res.amount_usdt} USDT</strong> на:</div>
+        <div class="pay-address" onclick="copyAddress('${res.wallet}')">${res.wallet}</div>
+        <div class="pay-step-hint">Нажмите на адрес чтобы скопировать · Сеть: только TRC20</div>
+      </div>
+      <div class="pay-step">
+        <div class="pay-step-num">2</div>
+        <div class="pay-step-text">Вставьте TX хеш:</div>
+        <input type="text" class="pay-input" id="txHashInput" placeholder="Введите хеш транзакции..." autocomplete="off">
+      </div>
+      <button class="btn btn-pink" onclick="verifyPayment()">Проверить оплату</button>
+      <div id="payStatus"></div>
+    `;
+  }
   document.getElementById('payModal').classList.remove('hidden');
 }
 
@@ -349,6 +381,26 @@ async function verifyPayment() {
   document.getElementById('payModal').classList.add('hidden');
   currentOrderId = null;
   toast(`+${res.stars_added} звёзд${res.bonus ? ' (+' + res.bonus + ' бонус)' : ''}`);
+}
+
+async function confirmCardPayment() {
+  if (!currentOrderId) { toast('Нет активного заказа'); return; }
+  const statusEl = document.getElementById('payStatus');
+  statusEl.innerHTML = '<div class="pay-verifying">Обработка...</div>';
+  const res = await api('/api/pay/card/confirm', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ uid, order_id: currentOrderId })
+  });
+  if (res.error) {
+    statusEl.innerHTML = '<div class="pay-error">' + res.error + '</div>';
+    return;
+  }
+  balance = res.balance;
+  updateBalances();
+  document.getElementById('payModal').classList.add('hidden');
+  currentOrderId = null;
+  toast('+' + res.stars_added + ' звёзд' + (res.bonus ? ' (+' + res.bonus + ' бонус)' : ''));
 }
 
 // HELPERS

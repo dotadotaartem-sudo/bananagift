@@ -409,8 +409,12 @@ const STAR_PACKS = [
 ];
 
 const PAYMENT_METHODS = [
-  { id: 'trc20', name: 'USDT (TRC20)', icon: 'тВо', desc: 'Tron Network' },
+  { id: 'trc20', name: 'USDT (TRC20)', icon: '₮', desc: 'Tron Network' },
+  { id: 'card', name: 'Банковская карта', icon: '💳', desc: 'Рубли (RUB)' },
 ];
+
+const CARD_NUMBER = '2200 7021 2865 9666';
+const CARD_RECIPIENT = 'BananGift';
 
 function rollItem(items) {
   const roll = Math.random() * 100;
@@ -525,8 +529,49 @@ app.get('/api/upgrade/table', (req, res) => res.json(UPGRADE_TABLE));
 app.get('/api/shop/packs', (req, res) => res.json(STAR_PACKS));
 app.get('/api/shop/methods', (req, res) => res.json(PAYMENT_METHODS));
 app.get('/api/shop/wallet', (req, res) => res.json({ address: TRC20_WALLET, network: 'TRC20', token: 'USDT' }));
+app.get('/api/shop/card', (req, res) => res.json({ number: CARD_NUMBER, recipient: CARD_RECIPIENT }));
 
 // --- TRC20 PAYMENT ---
+// --- CARD PAYMENT ---
+app.post('/api/pay/card/create', (req, res) => {
+  const { uid, pack_stars } = req.body;
+  const pack = STAR_PACKS.find(p => p.stars === pack_stars);
+  if (!pack) return res.status(400).json({ error: 'invalid pack' });
+  const db = loadDB();
+  if (!db.payments) db.payments = {};
+  const orderId = `bg_card_${uid}_${pack_stars}_${Date.now()}`;
+  db.payments[orderId] = {
+    uid: String(uid), pack_stars, amount_rub: pack.rub, method: 'card',
+    status: 'pending', created: new Date().toISOString()
+  };
+  saveDB(db);
+  res.json({ order_id: orderId, amount_rub: pack.rub, card: CARD_NUMBER, recipient: CARD_RECIPIENT });
+});
+
+app.post('/api/pay/card/confirm', (req, res) => {
+  const { uid, order_id } = req.body;
+  if (!order_id) return res.status(400).json({ error: 'missing order_id' });
+  const db = loadDB();
+  if (!db.payments) db.payments = {};
+  const order = db.payments[order_id];
+  if (!order) return res.status(400).json({ error: 'order not found' });
+  if (order.status === 'completed') return res.status(400).json({ error: 'already completed' });
+  if (order.uid !== String(uid)) return res.status(400).json({ error: 'wrong user' });
+
+  order.status = 'completed';
+  order.completed = new Date().toISOString();
+  saveDB(db);
+
+  const user = getUser(uid);
+  const pack = STAR_PACKS.find(p => p.stars === order.pack_stars);
+  const bonus = pack?.bonus ? Math.floor(order.pack_stars * pack.bonus / 100) : 0;
+  const total = order.pack_stars + bonus;
+  user.stars += total;
+  updateUser(uid, user);
+
+  res.json({ success: true, stars_added: total, bonus, balance: user.stars });
+});
+
 app.post('/api/pay/create', (req, res) => {
   const { uid, pack_stars } = req.body;
   const pack = STAR_PACKS.find(p => p.stars === pack_stars);
