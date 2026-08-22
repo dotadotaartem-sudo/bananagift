@@ -9,7 +9,7 @@
       "joined": "2026-08-22T12:56:40.317Z"
     },
     "8989575087": {
-      "stars": 749,
+      "stars": 748,
       "inventory": [
         {
           "name": "Heart",
@@ -91,6 +91,15 @@
           "rarity": "common",
           "from_case": "Star Case",
           "time": "2026-08-22T13:02:16.865Z"
+        },
+        {
+          "name": "Heart",
+          "emoji": "❤️",
+          "img": "/img/gifts/heart.png",
+          "value": 15,
+          "rarity": "common",
+          "from_case": "Star Case",
+          "time": "2026-08-22T13:02:26.491Z"
         }
       ],
       "history": [
@@ -156,10 +165,17 @@
           "value": 15,
           "profit": 14,
           "time": "2026-08-22T13:02:16.865Z"
+        },
+        {
+          "case": "Star Case",
+          "item": "Heart",
+          "value": 15,
+          "profit": 14,
+          "time": "2026-08-22T13:02:26.491Z"
         }
       ],
-      "total_opened": 9,
-      "total_spent": 251,
+      "total_opened": 10,
+      "total_spent": 252,
       "joined": "2026-08-21T08:28:36.813Z"
     },
     "6312812921": {
