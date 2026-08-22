@@ -50,7 +50,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif
 /* CASES */
 .case-card{background:var(--bg2);border-radius:var(--radius);display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(234,179,8,.08);cursor:pointer;transition:.15s;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 .case-card:active{transform:scale(.96);box-shadow:0 1px 4px rgba(0,0,0,.3);border-color:rgba(234,179,8,.3)}
-.case-img-wrap{width:100%;padding-top:100%;position:relative;overflow:hidden;background:var(--bg3)}
+.case-img-wrap{width:100%;padding-top:100%;position:relative;overflow:hidden;background:var(--bg2)}
 .case-img-wrap img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;animation:caseBounce 2s ease-in-out infinite alternate}
 @keyframes caseBounce{0%{transform:translateY(0)}100%{transform:translateY(-4px)}}
 .case-fallback{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px}

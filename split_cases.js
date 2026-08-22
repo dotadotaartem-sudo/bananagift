@@ -6,12 +6,11 @@ const path = require('path');
   const dir = path.join('C:\\Users\\PC\\Downloads', 'для кейсов');
   const files = fs.readdirSync(dir)
     .filter(f => f.endsWith('.png'))
-    .sort()
-    .slice(0, 8);
+    .sort();
   
   const ids = ['star', 'summer', 'rgb', 'regular', 'farm', 'flex', 'vision', 'fresh'];
   
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < ids.length; i++) {
     const src = path.join(dir, files[i]);
     const id = ids[i];
     
@@ -24,7 +23,6 @@ const path = require('path');
     const { data, info } = buf;
     const ch = info.channels;
     
-    // Sample corners for bg
     const sample = (x, y) => {
       const idx = (y * info.width + x) * ch;
       return [data[idx], data[idx+1], data[idx+2]];
@@ -35,8 +33,8 @@ const path = require('path');
     const bgB = Math.round(corners.reduce((s,c) => s+c[2], 0) / corners.length);
     console.log(`${files[i]} -> ${id}: bg rgb(${bgR},${bgG},${bgB})`);
     
-    const threshold = 40;
-    const edgeSoftness = 30;
+    const threshold = 70;
+    const edgeSoftness = 50;
     
     for (let p = 0; p < data.length; p += ch) {
       const dr = data[p] - bgR;
