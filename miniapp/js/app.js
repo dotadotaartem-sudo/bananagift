@@ -66,13 +66,18 @@ function showPage(name) {
 async function loadCases() {
   const cases = await api('/api/cases');
   const el = document.getElementById('caseList');
-  el.innerHTML = cases.map(c => `
+  el.innerHTML = cases.map(c => {
+    const imgSrc = `/img/cases/${c.id}.png`;
+    return `
     <div class="case-card" onclick="openCase('${c.id}')">
-      <div class="case-icon"><img src="/img/hero_nobg.png" class="case-img" onerror="this.style.display='none';this.parentElement.textContent='${c.icon}'"></div>
-      <div class="case-name">${c.name}</div>
-      <div class="case-price">★ ${c.price}</div>
+      <div class="case-img-wrap"><img src="${imgSrc}" class="case-img" onerror="this.style.display='none';this.parentElement.parentElement.querySelector('.case-fallback').style.display='flex'"></div>
+      <div class="case-fallback" style="display:none"><span>${c.icon}</span></div>
+      <div class="case-bottom">
+        <div class="case-name">${c.name}</div>
+        <div class="case-price">★ ${c.price}</div>
+      </div>
     </div>
-  `).join('');
+  `}).join('');
 }
 
 async function openCase(cid) {
@@ -82,7 +87,7 @@ async function openCase(cid) {
   const items = await api(`/api/case/${cid}/items`);
 
   document.getElementById('caseOpenTop').innerHTML = `
-    <div class="case-open-icon"><img src="/img/hero_nobg.png" class="case-open-img" onerror="this.style.display='none';this.parentElement.textContent='${c.icon}'"></div>
+    <div class="case-open-icon"><img src="/img/cases/${c.id}.png" class="case-open-img" onerror="this.style.display='none';this.parentElement.textContent='${c.icon}'"></div>
     <div class="case-open-name">${c.name}</div>
     <div class="case-open-price">★ ${c.price}</div>
   `;

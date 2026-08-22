@@ -48,13 +48,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif
 .cases-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
 /* CASES */
-.case-card{background:var(--bg2);border-radius:var(--radius);padding:14px 10px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;border:1px solid rgba(234,179,8,.08);cursor:pointer;transition:.15s;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.case-card{background:var(--bg2);border-radius:var(--radius);display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(234,179,8,.08);cursor:pointer;transition:.15s;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 .case-card:active{transform:scale(.96);box-shadow:0 1px 4px rgba(0,0,0,.3);border-color:rgba(234,179,8,.3)}
-.case-icon{width:80px;height:80px;border-radius:14px;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.case-img{width:72px;height:72px;object-fit:contain;border-radius:8px}
-.case-name{font-size:12px;font-weight:700;line-height:1.2}
+.case-img-wrap{width:100%;height:140px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg3)}
+.case-fallback{width:100%;height:140px;display:flex;align-items:center;justify-content:center;font-size:48px}
+.case-img{width:100%;height:100%;object-fit:cover;animation:caseFloat 3s ease-in-out infinite alternate}
+@keyframes caseFloat{0%{transform:translateY(0)}100%{transform:translateY(-8px)}}
+.case-bottom{padding:10px 12px;text-align:center}
+.case-name{font-size:11px;font-weight:700;line-height:1.2}
 .case-meta{font-size:10px;color:var(--text2)}
-.case-price{font-size:13px;font-weight:800;color:var(--accent)}
+.case-price{font-size:13px;font-weight:800;color:var(--accent);margin-top:4px}
 .case-arrow{display:none}
 
 /* CASE OPEN */
